@@ -1,0 +1,20 @@
+version: '3.1'
+services:
+  postgres:
+    image: postgres:alpine3.16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  adminer:
+    image: adminer:4.8.1
+    ports:
+      - 9000:8080
+
+volumes:
+  postgres_data:
+    external: true

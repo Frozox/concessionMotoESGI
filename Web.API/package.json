@@ -1,0 +1,23 @@
+{
+  "name": "concession-moto-esgi-api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon --inspect --trace-warnings index.js",
+    "migrate": "node migrate.js",
+    "main": "node index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.8.0",
+    "sequelize": "^6.25.0",
+    "socket.io": "^4.5.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
