@@ -9,10 +9,7 @@ install:
 start-db:
 	docker compose up -d
 
-start-api:
-	yarn dev
-
-start-ui:
+start:
 	yarn dev
 
 stop:
