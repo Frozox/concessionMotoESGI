@@ -24,3 +24,5 @@ if the database has no data :
 ## Packages
 
 - [Tailwindcss](https://tailwindcss.com/)
+- [Framer motion](https://www.framer.com/motion/)
+- [Socket IO](https://socket.io/)
