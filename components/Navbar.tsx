@@ -9,9 +9,10 @@ import { Register } from "./Register"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
     const myLinks = [
-        { href: "/", label: "Home" },
-        { href: "/moto-models", label: "Modèles" },
-        { href: "/pieces", label: "Pièces" },
+        { href: "/", label: "Home", visible: true },
+        { href: "/moto-models", label: "Modèles", visible: true },
+        { href: "/pieces", label: "Pièces", visible: true },
+        { href: "/orders", label: "Mes commandes", visible: true },
     ]
     const { isShowing, toggle } = useModal()
     const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
@@ -43,16 +44,21 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 1 }}
                                 className='text-sm lg:flex-grow'>
-                                {myLinks.map((link) => (
-                                    <Link href={link.href} key={link.label} className='block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4'>
-                                        {link.label}
-                                    </Link>
-                                ))}
+                                {myLinks.map((link) => {
+                                    if (link.visible) {
+                                        return (
+                                            <Link href={link.href} className='block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4'>
+                                                {link.label}
+                                            </Link>
+                                        )
+                                    }
+                                })}
                             </motion.div>
                             <motion.div
                                 initial={{ opacity: 0, x: 100 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 1 }}
+                                className='space-x-2'
                             >
                                 <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggle}>
                                     Login
@@ -60,7 +66,6 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
 
                                 <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggleRegister}>
                                     Inscription
-
                                 </div>
 
                             </motion.div>
