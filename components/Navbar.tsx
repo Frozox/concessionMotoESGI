@@ -5,6 +5,7 @@ import { Modal } from "./Modal"
 import useModal from "../helpers/hooks/useModal/useModal"
 import { Login } from "./Login"
 import { motion } from 'framer-motion'
+import { Register } from "./Register"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
     const myLinks = [
@@ -13,6 +14,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
         { href: "/pieces", label: "Pièces" },
     ]
     const { isShowing, toggle } = useModal()
+    const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
     return (
         <Fragment>
             <div className="h-screen flex flex-col">
@@ -55,14 +57,26 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggle}>
                                     Login
                                 </div>
-                                <Modal
-                                    isShowing={isShowing}
-                                    toggle={toggle}
-                                    title='Login'
-                                    content={<Login />}
-                                />
+
+                                <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggleRegister}>
+                                    Inscription
+
+                                </div>
+
                             </motion.div>
                         </div>
+                        <Modal
+                            isShowing={isShowing}
+                            toggle={toggle}
+                            title="Login"
+                            content={<Login />}
+                        />
+                        <Modal
+                            isShowing={isShowingRegister}
+                            toggle={toggleRegister}
+                            title='Inscription'
+                            content={<Register />}
+                        />
                     </nav>
                 </div>
                 <div className="h-full w-full overflow-scroll bg-[#292929] text-white">
