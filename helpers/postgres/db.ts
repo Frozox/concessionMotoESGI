@@ -4,16 +4,22 @@ let conn: any;
 
 if (!conn) {
     console.log('Creating new connection');
+    console.log(process.env.POSTGRES_CON_STRING);
 
     conn = new Pool({
         user: process.env.POSTGRES_USER,
         password: process.env.POSTGRES_PASSWORD,
-        host: process.env.PGSQL_HOST,
-        port: 9000,
-        database: process.env.POSTGRES_CON_STRING,
+        host: process.env.POSTGRES_HOST,
+        port: 5432,
+        database: process.env.POSTGRES_DB,
     });
 
-    console.log('Connection created');
+    try {
+        conn.connect();
+        console.log('Connected to database');
+    } catch {
+        console.log('Error connecting to database');
+    }
 
 }
 
