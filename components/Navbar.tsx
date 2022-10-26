@@ -9,10 +9,9 @@ import { Register } from "./Register"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
     const myLinks = [
-        { href: "/", label: "Home", visible: true },
-        { href: "/moto-models", label: "Modèles", visible: true },
-        { href: "/pieces", label: "Pièces", visible: true },
-        { href: "/orders", label: "Mes commandes", visible: true },
+        { href: "/messages", label: "Messages", visible: true },
+        { href: "/counslor", label: "Assistance", visible: true },
+        { href: "/admin", label: "Administration", visible: true },
     ]
     const { isShowing, toggle } = useModal()
     const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
@@ -23,12 +22,13 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                     <nav className='w-full top-0 flex items-center justify-between flex-wrap bg-gray-800 p-6'>
                         <motion.div
                             initial={{ opacity: 0, x: -100 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            whileInView={{ opacity: 1, x: 0 }}
                             transition={{ duration: 1 }}
+                            viewport={{ once: true }}
                             className='flex items-center flex-shrink-0 text-white mr-6'
                         >
                             <img src='/favicon.ico' alt='Logo' className='w-8 h-8 mr-2' />
-                            <span className='font-semibold text-xl tracking-tight'>Moto concession</span>
+                            <Link href={'/'} className='font-semibold text-xl tracking-tight'>Suzuki</Link>
                         </motion.div>
                         <div className='block lg:hidden'>
                             <button className='flex items-center px-3 py-2 border rounded text-gray-200 border-gray-400 hover:text-white hover:border-white'>
