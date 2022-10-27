@@ -101,7 +101,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                         />
                     </nav>
                 </div>
-                <div className="h-full w-full overflow-scroll bg-[#292929] text-white">
+                <div className="h-full w-full overflow-scroll bg-[#292929] text-white scroll-smooth">
                     {/* <button onClick={toggleAlert}>Notif</button> */}
                     {children}
                 </div>
