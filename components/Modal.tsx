@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
-import { UseModal } from '../helpers/hooks/useModal/modal';
+import { UseModal } from '../helpers/hooks/Modal/modal';
 import { AnimatePresence, motion } from 'framer-motion'
 
 export const Modal = ({ isShowing, toggle, yesNo, yesNoAction, title, text, content }: UseModal) => isShowing ? ReactDOM.createPortal(

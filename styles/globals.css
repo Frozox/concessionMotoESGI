@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .input-user-navbar {
+        @apply py-3 px-2 bg-white flex items-center justify-center rounded-lg hover:shadow-xl shadow-lg text-gray-700;
+    }
+}
