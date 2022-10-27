@@ -14,6 +14,7 @@
     "framer-motion": "^7.6.1",
     "next": "^13.0.0",
     "pg": "^8.8.0",
+    "prisma": "^4.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.38.0",
