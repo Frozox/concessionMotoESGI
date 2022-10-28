@@ -58,10 +58,10 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 1 }}
                                 className='text-sm lg:flex-grow'>
-                                {myLinks.map((link) => {
+                                {myLinks.map((link, index) => {
                                     if (link.visible) {
                                         return (
-                                            <Link href={link.href} className='block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4'>
+                                            <Link href={link.href} key={index} className='block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4'>
                                                 {link.label}
                                             </Link>
                                         )

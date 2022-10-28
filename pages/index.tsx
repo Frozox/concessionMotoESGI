@@ -17,7 +17,6 @@ const Home: NextPage = () => {
             <Head>
                 <title>Suzuki concession & aide | ESGI</title>
                 <meta name="description" content="Suzuki concession & aide | ESGI" />
-                <link rel="icon" href="/suzuki-logo.ico" />
             </Head>
             <div className='w-full h-full'>
                 <header
