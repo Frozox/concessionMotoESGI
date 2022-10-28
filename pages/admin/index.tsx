@@ -1,15 +1,14 @@
 import { Tab } from "@headlessui/react"
 import { NextPage } from "next"
 import React from "react"
-import { IItemTableProps, SelectableItemTable } from "../../components/SelectableItemTable"
+import { SelectableItemTable } from "../../components/SelectableItemTable"
 
 const AdminTableSlug: NextPage = () => {
     const [selectedIndex, setSelectedIndex] = React.useState(0)
     const channels = [
-        { id: '1', title: 'Item1', members: ['Loan', 'Tom', 'Raph'], capacity: 10, owner: { email: 'loan.cleris@gmail.com', firstName: 'Loan', lastName: 'Cleris' }, createdAt: '03/11/2022', status: true, content: <>test</> },
-        { id: '2', title: 'Item2', members: ['Loan', 'Tom', 'Raph'], capacity: 10, owner: { email: 'test@test.fr', firstName: 'Tom', lastName: 'Cuillandre' }, createdAt: '04/11/2022', status: false, content: <>test 2</> },
+        { id: '1', title: "J'ai un probleme avec mon pot d'échapement", members: ['Loan', 'Tom', 'Raph'], capacity: 10, owner: { email: 'loan.cleris@gmail.com', firstName: 'Loan', lastName: 'Cleris' }, createdAt: '03/11/2022', status: true },
+        { id: '2', title: "J'ai pas assez de vitesse que dois-je faire ? ", members: ['Loan', 'Tom', 'Raph'], capacity: 10, owner: { email: 'test@test.fr', firstName: 'Tom', lastName: 'Cuillandre' }, createdAt: '04/11/2022', status: false },
     ]
-    console.log(selectedIndex);
 
     return (
         <div className="w-full h-full px-10 space-y-2 flex justify-center items-center flex-col">
@@ -21,9 +20,10 @@ const AdminTableSlug: NextPage = () => {
                 </Tab.List>
                 <Tab.Panels className={'bg-slate-200 rounded-xl h-[70vh] w-full text-black p-3'}>
                     <Tab.Panel className={`space-y-2`}>
-                        {channels.map((channel) => (
+                        {channels.map((channel, index) => (
                             <SelectableItemTable
                                 {...channel}
+                                key={index}
                             />
                         ))}
                     </Tab.Panel>
