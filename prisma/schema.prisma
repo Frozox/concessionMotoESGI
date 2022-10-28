@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String          @id @default(uuid())
+  email                  String          @unique
+  firstName              String
+  lastName               String
+  password               String
+  online                 Boolean         @default(false)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @default(now()) @updatedAt
+  roles                  Role[]
+  bikes                  Bike[]
+  MemberOnChannels       ChannelMember[]
+  authorDirectMessages   DirectMessage[] @relation("AuthorDirectMessages")
+  receiverDirectMessages DirectMessage[] @relation("ReceiverDirectMessages")
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  User      User[]
+}
+
+model Bike {
+  id        String   @id @default(uuid())
+  year      Int
+  model     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  User      User[]
+}
+
+model Channel {
+  id        String           @id @default(uuid())
+  title     String
+  capacity  Int
+  status    String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now()) @updatedAt
+  members   ChannelMember[]
+  Messages  ChannelMessage[]
+}
+
+model ChannelMember {
+  id             String           @unique @default(uuid())
+  user           User             @relation(fields: [userId], references: [id])
+  userId         String
+  channel        Channel          @relation(fields: [channelId], references: [id])
+  channelId      String
+  ChannelMessage ChannelMessage[]
+  ChannelRole    ChannelRole?     @relation(fields: [channelRoleId], references: [id])
+  channelRoleId  String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+
+  @@id([userId, channelId])
+  @@unique([userId, channelId])
+}
+
+model ChannelRole {
+  id            String          @id @default(uuid())
+  name          String          @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+  ChannelMember ChannelMember[]
+}
+
+model ChannelMessage {
+  id        String        @id @default(uuid())
+  channel   Channel       @relation(fields: [channelId], references: [id])
+  channelId String
+  author    ChannelMember @relation(fields: [authorId], references: [id])
+  authorId  String
+  content   String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now()) @updatedAt
+}
+
+model DirectMessage {
+  id         String   @id @default(uuid())
+  author     User     @relation(name: "AuthorDirectMessages", fields: [authorId], references: [id])
+  authorId   String
+  receiver   User     @relation(name: "ReceiverDirectMessages", fields: [receiverId], references: [id])
+  receiverId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+}
