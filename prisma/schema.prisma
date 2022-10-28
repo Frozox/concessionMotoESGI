@@ -11,67 +11,91 @@ datasource db {
 }
 
 model User {
-  id              Int             @id @default(autoincrement())
-  email           String          @unique
-  firstName       String
-  lastName        String
-  online          Boolean         @default(false)
-  roles           String[]        @default(["USER"])
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  MemberOnChannel ChannelMember[]
-  Bikes           Bike[]
+  id                     String          @id @default(uuid())
+  email                  String          @unique
+  firstName              String
+  lastName               String
+  password               String
+  online                 Boolean         @default(false)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @default(now()) @updatedAt
+  roles                  Role[]
+  bikes                  Bike[]
+  MemberOnChannels       ChannelMember[]
+  authorDirectMessages   DirectMessage[] @relation("AuthorDirectMessages")
+  receiverDirectMessages DirectMessage[] @relation("ReceiverDirectMessages")
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  User      User[]
 }
 
 model Bike {
-  id     Int    @id @default(autoincrement())
-  year   Int
-  model  String
-  User   User?  @relation(fields: [userId], references: [id])
-  userId Int?
+  id        String   @id @default(uuid())
+  year      Int
+  model     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  User      User[]
 }
 
 model Channel {
-  id             Int              @id @default(autoincrement())
-  owner          User              @relation(fields: [ownerId], references: [id])
-  ownerId        Int
-  title          String
-  capacity       Int
-  status         String
-  members        ChannelMember[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  ChannelMessage ChannelMessage[]
+  id        String           @id @default(uuid())
+  title     String
+  capacity  Int
+  status    String
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now()) @updatedAt
+  members   ChannelMember[]
+  Messages  ChannelMessage[]
 }
 
 model ChannelMember {
+  id             String           @unique @default(uuid())
   user           User             @relation(fields: [userId], references: [id])
-  userId         Int
+  userId         String
   channel        Channel          @relation(fields: [channelId], references: [id])
-  channelId      Int
+  channelId      String
   ChannelMessage ChannelMessage[]
+  ChannelRole    ChannelRole?     @relation(fields: [channelRoleId], references: [id])
+  channelRoleId  String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
 
   @@id([userId, channelId])
+  @@unique([userId, channelId])
+}
+
+model ChannelRole {
+  id            String          @id @default(uuid())
+  name          String          @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now()) @updatedAt
+  ChannelMember ChannelMember[]
 }
 
 model ChannelMessage {
-  id        Int           @id @default(autoincrement())
+  id        String        @id @default(uuid())
   channel   Channel       @relation(fields: [channelId], references: [id])
-  channelId Int
-  author    ChannelMember @relation(fields: [authorId], references: [userId])
-  authorId  Int
+  channelId String
+  author    ChannelMember @relation(fields: [authorId], references: [id])
+  authorId  String
   content   String
   createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  updatedAt DateTime      @default(now()) @updatedAt
 }
 
-// model PrivateMessage {
-//   id         Int      @id @default(autoincrement())
-//   author     User     @relation(fields: [authorId], references: [id])
-//   authorId   Int
-//   recipient  User     @relation(fields: [receiverId], references: [id])
-//   receiverId Int
-//   content    String
-//   createdAt  DateTime @default(now())
-//   updatedAt  DateTime @updatedAt
-// }
+model DirectMessage {
+  id         String   @id @default(uuid())
+  author     User     @relation(name: "AuthorDirectMessages", fields: [authorId], references: [id])
+  authorId   String
+  receiver   User     @relation(name: "ReceiverDirectMessages", fields: [receiverId], references: [id])
+  receiverId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+}
