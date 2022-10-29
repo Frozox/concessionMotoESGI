@@ -16,8 +16,8 @@ const FAQ: NextPage = () => {
             </Head>
             <div className='w-full p-5'>
                 <div className='w-full bg-white rounded-xl p-3 space-y-3'>
-                    {myFaqs && myFaqs.map((faq: IDisclosure) => (
-                        <DisclosureComp value={faq} />
+                    {myFaqs && myFaqs.map((faq: IDisclosure, index: number) => (
+                        <DisclosureComp value={faq} key={index} />
                     ))}
                     <div className='flex justify-center'>
                         <span className='text-gray-700 mr-1'>Vous ne trouvez pas les réponses à vos questions ? Essayer le</span>

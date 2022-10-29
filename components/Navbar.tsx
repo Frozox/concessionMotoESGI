@@ -20,6 +20,11 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
     const { isShowing, toggle } = useModal()
     const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
     const { showAlert, toggleAlert } = useAlert()
+    const [token, setToken] = React.useState<string | null>('')
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') setToken(localStorage.getItem('token'))
+        else setToken(null)
+    })
     return (
         <Fragment>
             <div className="h-screen flex flex-col">
@@ -58,10 +63,10 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 1 }}
                                 className='text-sm lg:flex-grow'>
-                                {myLinks.map((link) => {
+                                {myLinks.map((link, index) => {
                                     if (link.visible) {
                                         return (
-                                            <Link href={link.href} className='block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4'>
+                                            <Link href={link.href} key={index} className='block mt-4 lg:inline-block lg:mt-0 text-gray-200 hover:text-white mr-4'>
                                                 {link.label}
                                             </Link>
                                         )
@@ -74,17 +79,22 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 transition={{ duration: 1 }}
                                 className='space-x-2 flex justify-center items-center'
                             >
-                                {/* <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggle}>
-                                    Login
-                                </div>
+                                {token === null ? (
+                                    <Fragment>
+                                        <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggle}>
+                                            Login
+                                        </div>
 
-                                <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggleRegister}>
-                                    Inscription
-                                </div> */}
-                                <Avatar
-                                    indicator={2}
-                                    userLetters={'LC'}
-                                />
+                                        <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggleRegister}>
+                                            Inscription
+                                        </div>
+                                    </Fragment>
+                                ) : (
+                                    <Avatar
+                                        indicator={2}
+                                        userLetters={'LC'}
+                                    />
+                                )}
                             </motion.div>
                         </div>
                         <Modal

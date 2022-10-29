@@ -37,7 +37,7 @@ export const Register = () => {
                 {errors.password && <span>This field is required</span>}
             </div>
             <button className='w-full h-10 my-2 bg-blue-400 hover:bg-blue-500 text-white rounded-md justify-center items-center flex cursor-pointer'>
-                S'incrire
+                S&apos;incrire
             </button>
         </form>
     )
