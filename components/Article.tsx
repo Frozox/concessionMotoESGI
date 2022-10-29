@@ -22,7 +22,7 @@ export const Article = ({ img, title, description, link }: IArticle) => {
                 <h2 className="card-title">{title}</h2>
                 <p>{description}</p>
                 <div className="card-actions justify-end">
-                    <Link href={link} className="btn btn-primary">En savoir plus !</Link>
+                    <Link href={link} target={'_blank'} className="btn btn-primary">En savoir plus !</Link>
                 </div>
             </div>
         </div>

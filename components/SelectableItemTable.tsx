@@ -27,7 +27,7 @@ export const SelectableItemTable = (
     return (
         <Fragment>
             <div
-                className="w-full p-3 rounded-lg shadow-lg hover:shadow-xl flex justify-between items-center bg-white"
+                className="w-full p-3 rounded-lg shadow-lg hover:shadow-xl flex justify-between items-center bg-white text-black"
                 key={id}
             >
                 <div className="w-fit">{title}</div>
