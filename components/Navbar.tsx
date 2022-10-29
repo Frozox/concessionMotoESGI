@@ -101,13 +101,13 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                             isShowing={isShowing}
                             toggle={toggle}
                             title="Login"
-                            content={<Login />}
+                            content={<Login modalToggle={toggle} />}
                         />
                         <Modal
                             isShowing={isShowingRegister}
                             toggle={toggleRegister}
                             title='Inscription'
-                            content={<Register />}
+                            content={<Register modalToggle={toggleRegister} />}
                         />
                     </nav>
                 </div>
