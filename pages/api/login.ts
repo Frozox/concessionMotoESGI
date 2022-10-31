@@ -60,7 +60,7 @@ const jwtAuth = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, roles: user.roles },
+      { id: user.id, email: user.email, roles: user.roles, firstName: user.firstName, lastName: user.lastName },
       process.env.JWT_SECRET as string,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );

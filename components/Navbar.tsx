@@ -1,4 +1,4 @@
-import { Fragment, ReactNode } from "react"
+import { Fragment } from "react"
 import Link from "next/link"
 import React from "react"
 import { Modal } from "./Modal"
@@ -9,22 +9,22 @@ import { Register } from "./Register"
 import { AlertPopHover } from "./AlertPopHover"
 import { useAlert } from "../helpers/hooks/Alert/useAlert"
 import { Avatar } from "./Avatar"
+import { getInitial } from "../helpers/helper"
+import { useAuth } from "../helpers/context/User"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
+    const { isShowing, toggle } = useModal()
+    const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
+    const { showAlert, toggleAlert } = useAlert()
+    const { isAdmin, user, token } = useAuth()
+
     const myLinks = [
         { href: "/forum", label: "Forum", visible: true },
         { href: "/counslor", label: "Assistance", visible: true },
         { href: "/faq", label: "FAQ", visible: true },
-        { href: "/admin", label: "Administration", visible: true },
+        { href: "/admin", label: "Administration", visible: isAdmin },
     ]
-    const { isShowing, toggle } = useModal()
-    const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
-    const { showAlert, toggleAlert } = useAlert()
-    const [token, setToken] = React.useState<string | null>('')
-    React.useEffect(() => {
-        if (typeof window !== 'undefined') setToken(localStorage.getItem('token'))
-        else setToken(null)
-    })
+
     return (
         <Fragment>
             <div className="h-screen flex flex-col">
@@ -92,7 +92,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 ) : (
                                     <Avatar
                                         indicator={2}
-                                        userLetters={'LC'}
+                                        userLetters={getInitial(user?.firstName + ' ' + user?.lastName)}
                                     />
                                 )}
                             </motion.div>

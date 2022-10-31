@@ -4,6 +4,7 @@ import { Navbar } from '../components/Navbar'
 import { QueryClient, QueryClientProvider, Hydrate, } from "react-query";
 import React from 'react';
 import Head from 'next/head';
+import { AuthProvider } from '../helpers/context/User';
 
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -14,13 +15,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="description" content="Suzuki concession & aide | ESGI" />
         <link rel="icon" href="/suzuki-logo.ico" />
       </Head>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <Navbar>
-            <Component {...pageProps} />
-          </Navbar>
-        </Hydrate>
-      </QueryClientProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <Navbar>
+              <Component {...pageProps} />
+            </Navbar>
+          </Hydrate>
+        </QueryClientProvider>
+      </AuthProvider>
     </>
   )
 }

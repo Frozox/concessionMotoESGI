@@ -37,7 +37,6 @@ export const Avatar = ({ indicator, userLetters }: IAvatar) => {
                         Deconnexion
                     </Link>
                 </div>
-                <img src="/solutions.jpg" alt="" />
             </Popover.Panel>
         </Popover>
 

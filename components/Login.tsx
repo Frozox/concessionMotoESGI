@@ -1,9 +1,11 @@
+import { useRouter } from "next/router";
 import React from "react"
 import { useForm } from "react-hook-form";
 
 export const Login = ({ modalToggle }: { modalToggle: () => void }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [formError, setFormError] = React.useState('');
+    const router = useRouter()
     const onSubmit = (data: any) => {
         fetch('/api/login', {
             method: 'POST',
@@ -15,6 +17,7 @@ export const Login = ({ modalToggle }: { modalToggle: () => void }) => {
             if (res.ok) {
                 res.json().then(data => {
                     localStorage.setItem('token', data.token)
+                    router.push('/')
                     modalToggle()
                 })
             } else {

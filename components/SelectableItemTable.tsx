@@ -6,12 +6,13 @@ import { BiEdit } from 'react-icons/bi'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import React from "react"
+import { useAuth } from "../helpers/context/User"
 export interface IItemTableProps {
     title: string
     members: string[]
     capacity: number
     id: string
-    owner: { email: string, firstName: string, lastName: string }
+    owner: string
     createdAt: string
     status: boolean
 }
@@ -24,6 +25,7 @@ export const SelectableItemTable = (
     const handleStatus = () => {
         console.log('status', !status);
     }
+    const { user } = useAuth()
     return (
         <Fragment>
             <div
@@ -33,7 +35,7 @@ export const SelectableItemTable = (
                 <div className="w-fit">{title}</div>
                 <div className="space-x-20 flex justify-evenly items-center w-2/3">
                     <div className="w-fit min-w-[7rem]">{members.length}/{capacity}</div>
-                    <div className="w-fit min-w-[7rem]">{owner.firstName} {owner.lastName}</div>
+                    <div className="w-fit min-w-[7rem]">{owner}</div>
                     <div className="w-fit min-w-[7rem]">{createdAt}</div>
                     <div className="w-fit min-w-[7rem]">{status
                         ? (
@@ -83,7 +85,7 @@ export const SelectableItemTable = (
                         members={members}
                         capacity={capacity}
                         id={id}
-                        owner={owner}
+                        owner={user?.firstName + ' ' + user?.lastName}
                         status={status}
                         createdAt={createdAt}
                     />
@@ -139,7 +141,7 @@ export const HandleFormUpdate = ({ title, capacity, owner }: IItemTableProps) =>
                 {errors.lastname && <span>This field is required</span>}
             </div>
             <div className='flex flex-col'>
-                <input type='text' {...register('owner', { required: true })} placeholder='Propriétaire' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none' defaultValue={owner.email} />
+                <input type='text' {...register('owner', { required: true })} placeholder='Propriétaire' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none' defaultValue={owner} />
                 {errors.email && <span>This field is required</span>}
             </div>
         </form>
