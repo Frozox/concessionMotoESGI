@@ -16,7 +16,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [token, setToken] = React.useState<string | null>(null)
     const [user, setUser] = React.useState<UserJWT | null>(null)
     const valueToWatch = typeof window !== 'undefined' && localStorage.getItem('token')
-    const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || undefined
+    const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || false
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {

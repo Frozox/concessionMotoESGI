@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { Modal } from "../../components/Modal"
 import { useAuth } from "../../helpers/context/User"
 import useModal from "../../helpers/hooks/Modal/useModal"
+import { useSession } from "../../helpers/hooks/User/session"
 
 export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     const [selectedIndex, setSelectedIndex] = React.useState(0)
@@ -16,45 +17,51 @@ export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     ]
     const router = useRouter()
     const { toggle, isShowing } = useModal()
-    const { isAdmin } = useAuth()
+    const { session, loading } = useSession()
+
     React.useEffect(() => {
-        if (!isAdmin) {
-            router.push('/')
+        if (!loading) {
+            if (!session.isAdmin) {
+                router.push('/')
+            }
         }
-    }, [isAdmin])
+    }, [session])
+
     return (
-        <Fragment>
-            <div className="w-full h-full px-10 space-y-2 flex justify-center items-center flex-col">
-                <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
-                    <Tab.List className={'space-x-1 p-2 bg-[#ffffff10] rounded-xl w-full flex items-center justify-between'}>
-                        <div className="space-x-2">
-                            {headers.map((header, index) => (
-                                <TableList
-                                    key={index}
-                                    title={header.title}
-                                    link={header.link}
-                                />
-                            ))}
-                        </div>
-                        {headers[0].link === router.pathname ? (
-                            <div className="w-52 relative flex items-center space-x-3 justify-between">
-                                <div className="-ml-0.5 w-0.5 h-10 bg-white" />
-                                <div className="w-fit bg-white/50 text-center p-2 items-center rounded-md cursor-pointer hover:bg-white/90 hover:text-green-500" onClick={toggle}>Ajouté {headers[0].title}</div>
+        loading ? <div>Loading...</div> : (
+            <Fragment>
+                <div className="w-full h-full px-10 space-y-2 flex justify-center items-center flex-col">
+                    <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
+                        <Tab.List className={'space-x-1 p-2 bg-[#ffffff10] rounded-xl w-full flex items-center justify-between'}>
+                            <div className="space-x-2">
+                                {headers.map((header, index) => (
+                                    <TableList
+                                        key={index}
+                                        title={header.title}
+                                        link={header.link}
+                                    />
+                                ))}
                             </div>
-                        ) : null}
-                    </Tab.List>
-                    <Tab.Panels className={'bg-slate-200 rounded-xl h-[70vh] w-full text-black p-3'}>
-                        {children}
-                    </Tab.Panels>
-                </Tab.Group>
-            </div>
-            <Modal
-                isShowing={isShowing}
-                toggle={toggle}
-                title={'Ajouté un channel'}
-                content={<FormAddChannel modalToggle={toggle} />}
-            />
-        </Fragment>
+                            {headers[0].link === router.pathname ? (
+                                <div className="w-52 relative flex items-center space-x-3 justify-between">
+                                    <div className="-ml-0.5 w-0.5 h-10 bg-white" />
+                                    <div className="w-fit bg-white/50 text-center p-2 items-center rounded-md cursor-pointer hover:bg-white/90 hover:text-green-500" onClick={toggle}>Ajouté {headers[0].title}</div>
+                                </div>
+                            ) : null}
+                        </Tab.List>
+                        <Tab.Panels className={'bg-slate-200 rounded-xl h-[70vh] w-full text-black p-3'}>
+                            {children}
+                        </Tab.Panels>
+                    </Tab.Group>
+                </div>
+                <Modal
+                    isShowing={isShowing}
+                    toggle={toggle}
+                    title={'Ajouté un channel'}
+                    content={<FormAddChannel modalToggle={toggle} />}
+                />
+            </Fragment>
+        )
     )
 }
 
