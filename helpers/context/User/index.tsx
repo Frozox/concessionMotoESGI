@@ -6,11 +6,24 @@ export type UserJWT = User & {
     roles: Role[];
 };
 
-const AuthContext = React.createContext<{ user: UserJWT | null, token: string | null, isAdmin: boolean | undefined }>({
-    user: null,
-    token: null,
-    isAdmin: undefined
-});
+export type AuthContextType = {
+    user: UserJWT | null;
+    token: string | null;
+    isAdmin: boolean;
+    setToken: React.Dispatch<React.SetStateAction<string | null>>;
+    setUser: React.Dispatch<React.SetStateAction<UserJWT | null>>;
+};
+
+
+const AuthContext = React.createContext<{ auth: AuthContextType }>({
+    auth: {
+        user: null,
+        token: null,
+        isAdmin: false,
+        setToken: () => null,
+        setUser: () => null,
+    },
+})
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [token, setToken] = React.useState<string | null>(null)
@@ -26,12 +39,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(decoded)
         } else {
             setUser(null)
+            setToken(null)
         }
     }, [valueToWatch, typeof window, token])
 
-
     return (
-        <AuthContext.Provider value={{ user, token, isAdmin }}>
+        <AuthContext.Provider value={{ auth: { user, token, isAdmin, setToken, setUser } }}>
             {children}
         </AuthContext.Provider>
     )

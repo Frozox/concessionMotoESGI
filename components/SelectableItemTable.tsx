@@ -6,7 +6,7 @@ import { BiEdit } from 'react-icons/bi'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import React from "react"
-import { useAuth } from "../helpers/context/User"
+import { useSession } from "../helpers/hooks/User/session"
 export interface IItemTableProps {
     title: string
     members: string[]
@@ -25,7 +25,7 @@ export const SelectableItemTable = (
     const handleStatus = () => {
         console.log('status', !status);
     }
-    const { user } = useAuth()
+    const { session } = useSession()
     return (
         <Fragment>
             <div
@@ -85,7 +85,7 @@ export const SelectableItemTable = (
                         members={members}
                         capacity={capacity}
                         id={id}
-                        owner={user?.firstName + ' ' + user?.lastName}
+                        owner={session.user?.firstName + ' ' + session.user?.lastName}
                         status={status}
                         createdAt={createdAt}
                     />

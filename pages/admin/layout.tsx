@@ -4,7 +4,6 @@ import { useRouter } from "next/router"
 import React, { Fragment } from "react"
 import { useForm } from "react-hook-form"
 import { Modal } from "../../components/Modal"
-import { useAuth } from "../../helpers/context/User"
 import useModal from "../../helpers/hooks/Modal/useModal"
 import { useSession } from "../../helpers/hooks/User/session"
 
@@ -77,7 +76,7 @@ const TableList = ({ title, link }: { title: string, link: string }) => {
 const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [formError, setFormError] = React.useState('');
-    const { user } = useAuth()
+    const { session } = useSession()
     const onSubmit = (data: any) => {
         fetch('/api/users', {
             method: 'POST',
@@ -110,7 +109,7 @@ const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
                 {errors.lastname && <span>This field is required</span>}
             </div>
             <div className='flex flex-col'>
-                <input type='text' {...register('owner', { required: true, disabled: true })} className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none text-black' defaultValue={user?.firstName + ' ' + user?.lastName} />
+                <input type='text' {...register('owner', { required: true, disabled: true })} className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none text-black' defaultValue={session.user?.firstName + ' ' + session.user?.lastName} />
             </div>
             {formError && <p className='text-red-500'>{formError}</p>}
             <button className='w-full h-10 my-2 bg-blue-400 hover:bg-blue-500 text-white rounded-md justify-center items-center flex cursor-pointer'>
