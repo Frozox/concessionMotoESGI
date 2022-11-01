@@ -30,8 +30,10 @@ const getUsers = withMiddleware("withAuth")(
   }
 );
 
-const addUser = async (req: NextApiUserRequest, res: NextApiResponse) => {
+const addUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const { firstName, lastName, email, password } = req.body;
+  console.log(req.body);
+
   try {
     const user = await prisma.user.create({
       data: {

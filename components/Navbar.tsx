@@ -1,4 +1,4 @@
-import { Fragment, ReactNode } from "react"
+import { Fragment } from "react"
 import Link from "next/link"
 import React from "react"
 import { Modal } from "./Modal"
@@ -9,22 +9,32 @@ import { Register } from "./Register"
 import { AlertPopHover } from "./AlertPopHover"
 import { useAlert } from "../helpers/hooks/Alert/useAlert"
 import { Avatar } from "./Avatar"
+import { getInitial } from "../helpers/helper"
+import { useSession } from "../helpers/hooks/User/session"
+import { AuthContextType } from "../helpers/context/User"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
+    const { isShowing, toggle } = useModal()
+    const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
+    const { showAlert, toggleAlert } = useAlert()
+    const [show, setShow] = React.useState(false)
+    const { session } = useSession()
+
     const myLinks = [
         { href: "/forum", label: "Forum", visible: true },
         { href: "/counslor", label: "Assistance", visible: true },
         { href: "/faq", label: "FAQ", visible: true },
-        { href: "/admin", label: "Administration", visible: true },
+        { href: "/admin", label: "Administration", visible: session.isAdmin },
     ]
-    const { isShowing, toggle } = useModal()
-    const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
-    const { showAlert, toggleAlert } = useAlert()
-    const [token, setToken] = React.useState<string | null>('')
+
     React.useEffect(() => {
-        if (typeof window !== 'undefined') setToken(localStorage.getItem('token'))
-        else setToken(null)
-    })
+        if (session.token) {
+            setShow(true)
+        } else {
+            setShow(false)
+        }
+    }, [session.token])
+
     return (
         <Fragment>
             <div className="h-screen flex flex-col">
@@ -79,7 +89,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 transition={{ duration: 1 }}
                                 className='space-x-2 flex justify-center items-center'
                             >
-                                {token === null ? (
+                                {!show ? (
                                     <Fragment>
                                         <div className='inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-gray-800 hover:bg-white mt-4 lg:mt-0 cursor-pointer' onClick={toggle}>
                                             Login
@@ -92,7 +102,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 ) : (
                                     <Avatar
                                         indicator={2}
-                                        userLetters={'LC'}
+                                        userLetters={getInitial(session.user?.firstName + ' ' + session.user?.lastName)}
                                     />
                                 )}
                             </motion.div>
@@ -101,13 +111,13 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                             isShowing={isShowing}
                             toggle={toggle}
                             title="Login"
-                            content={<Login />}
+                            content={<Login modalToggle={toggle} />}
                         />
                         <Modal
                             isShowing={isShowingRegister}
                             toggle={toggleRegister}
                             title='Inscription'
-                            content={<Register />}
+                            content={<Register modalToggle={toggleRegister} />}
                         />
                     </nav>
                 </div>

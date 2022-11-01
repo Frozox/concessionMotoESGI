@@ -17,3 +17,10 @@ export const handleResponseTab = (data: any, status: 'idle' | 'loading' | 'error
         </div>
     )
 }
+
+export const getInitial = (initial: string) => {
+    const initials = initial.match(/\b\w/g) || []
+    return (
+        (initials.shift() || '') + (initials.pop() || '')
+    )
+}
