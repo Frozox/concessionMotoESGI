@@ -104,11 +104,31 @@ export const ifMessageAuthorOrAdmin: Middleware = async (
   return res.status(401).json({ message: "Unauthorized" });
 };
 
+export const ifDirectMessageAuthorOrReciver: Middleware = async (
+  req: NextApiUserRequest,
+  res,
+  next
+) => {
+  const message = await prisma.directMessage.findUnique({
+    where: {
+      id: String(req.query.directMessageId),
+    },
+  });
+  if (
+    message?.authorId === req.user.id ||
+    message?.receiverId === req.user.id
+  ) {
+    return next();
+  }
+  return res.status(401).json({ message: "Unauthorized" });
+};
+
 const withMiddleware = label({
   withAuth,
   withMeInQuery: [withAuth, withMeInQuery],
   inChannelOrAdmin: [withAuth, inChannelOrAdmin],
   ifMessageAuthorOrAdmin: [withAuth, ifMessageAuthorOrAdmin],
+  ifDirectMessageAuthorOrReciver: [withAuth, ifDirectMessageAuthorOrReciver],
   isAdmin: [withAuth, withRoles("ADMIN")],
 });
 
