@@ -1,8 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcrypt";
-import withMiddleware, { NextApiUserRequest } from "../../../lib/middlewares";
+import withMiddleware from "../../../lib/middlewares";
 import { exclude } from "../../../lib/prismaUtils";
+import { NextApiUserRequest } from "../../../lib/types";
 
 const prisma = new PrismaClient();
 

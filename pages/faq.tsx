@@ -7,7 +7,7 @@ import { DisclosureComp } from "../components/Disclosure";
 import { IDisclosure } from "./api/disclosure";
 
 const FAQ: NextPage = () => {
-    const { data: myFaqs } = useQuery<IDisclosure[]>('faqs', () => fetch('/api/disclosure').then(res => res.json()))
+    const { data: myFaqs } = useQuery<IDisclosure[]>('faqs', () => fetch('/api/faq').then(res => res.json()))
 
     return (
         <Fragment>

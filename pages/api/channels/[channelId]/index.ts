@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-import withMiddleware, { NextApiUserRequest } from "../../../../lib/middlewares";
+import withMiddleware from "../../../../lib/middlewares";
+import { NextApiUserRequest } from "../../../../lib/types";
 
 const prisma = new PrismaClient();
 

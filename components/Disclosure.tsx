@@ -7,7 +7,7 @@ export const DisclosureComp = ({ value }: any) => {
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex justify-between w-full px-4 py-5 text-sm font-medium text-left text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
-                        <span>{value.title}</span>
+                        <span>{value.question}</span>
                         <FiChevronDown
                             className={`${open ? 'transform rotate-180' : ''} w-5 h-5 text-gray-500 ease-in-out duration-150`}
                         />
@@ -22,7 +22,7 @@ export const DisclosureComp = ({ value }: any) => {
                         leaveTo="transform opacity-0 scale-95"
                     >
                         <Disclosure.Panel static className="px-4 pt-4 pb-2 text-sm text-gray-500">
-                            {value.description}
+                            {value.answer}
                         </Disclosure.Panel>
                     </Transition>
                 </>
