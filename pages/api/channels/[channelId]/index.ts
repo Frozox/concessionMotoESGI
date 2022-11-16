@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import withMiddleware from "../../../../lib/middlewares";
-import { NextApiUserRequest } from "../../../../lib/types";
+import { NextApiResponseServerIO, NextApiUserRequest } from "../../../../lib/types";
 
 const prisma = new PrismaClient();
 
@@ -55,7 +55,7 @@ const getChannel = withMiddleware("inChannelOrAdmin")(
 );
 
 const updateChannel = withMiddleware("inChannelOrAdmin")(
-  async (req: NextApiUserRequest, res: NextApiResponse) => {
+  async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
     const { title, capacity, open } = req.body;
 
     try {
@@ -84,6 +84,7 @@ const updateChannel = withMiddleware("inChannelOrAdmin")(
         },
       });
       if (channel) {
+        res.socket.server.io.emit("channels", "PATCH", channel);
         res.status(200).json(channel);
       } else {
         res.status(404).json({ message: "Channel not found" });
@@ -95,7 +96,7 @@ const updateChannel = withMiddleware("inChannelOrAdmin")(
 );
 
 const deleteChannel = withMiddleware("isAdmin")(
-  async (req: NextApiUserRequest, res: NextApiResponse) => {
+  async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
     try {
       const channel = await prisma.channel.delete({
         include: {
@@ -116,6 +117,7 @@ const deleteChannel = withMiddleware("isAdmin")(
         },
         where: { id: String(req.query.channelId) },
       });
+      res.socket.server.io.emit("channels", "DELETE", channel);
       res.status(200).json(channel);
     } catch (error) {
       res.status(500).json(error);

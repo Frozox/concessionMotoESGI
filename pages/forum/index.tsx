@@ -1,20 +1,40 @@
 import { Channel } from "@prisma/client"
 import { NextPage } from "next"
-import React from "react"
+import React, { useEffect } from "react"
 import { ChannelComponent } from "../../components/Channel"
 import { HiOutlineChatAlt2 } from 'react-icons/hi'
 import { AiOutlineStar } from 'react-icons/ai'
+import { io } from "socket.io-client"
+
+type IChannel = Channel & {
+    createdAt: string
+    _count: {
+        members: number
+    }
+}
 
 export const Forum: NextPage = () => {
-    const rawChannels: Channel[] = [
-        { id: '1', title: "General", capacity: 12, status: "open", createdAt: new Date(), updatedAt: new Date() },
-        { id: '2', title: "Support", capacity: 12, status: "open", createdAt: new Date(), updatedAt: new Date() },
-        { id: '3', title: "Suggestions", capacity: 12, status: "open", createdAt: new Date(), updatedAt: new Date() },
-        { id: '4', title: "Bug", capacity: 12, status: "open", createdAt: new Date(), updatedAt: new Date() },
-        { id: '5', title: "Marketing", capacity: 12, status: "open", createdAt: new Date(), updatedAt: new Date() },
-    ]
     const [searchValue, setSearchValue] = React.useState('');
     const searchRegex = new RegExp(searchValue, 'i');
+    const [channels, setChannels] = React.useState<IChannel[]>([])
+
+    useEffect(() => {
+        fetch('/api/channels').then(res => res.json()).then(setChannels);
+
+        const socket = io('ws://localhost:8080', { path: '/api/socket.io', auth: { token: localStorage.getItem('token') } });
+
+        socket.on('channels', (method, channel) => {
+            if (method === 'POST') {
+                setChannels(prev => [...prev, channel])
+            }
+            else if (method === 'DELETE') {
+                setChannels(prev => prev.filter(c => c.id !== channel.id))
+            }
+            else if (method === 'PATCH') {
+                setChannels(prev => prev.map(c => c.id === channel.id ? channel : c))
+            }
+        });
+    }, []);
 
     return (
         <div className="w-full h-full py-5 flex justify-start items-center relative">
@@ -32,9 +52,9 @@ export const Forum: NextPage = () => {
                 <div>
                     <input type="text" className="w-full p-3 bg-transparent border rounded-md focus:outline-none" placeholder="Rechercher discussions" value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
                 </div>
-                {rawChannels.filter((item) => searchRegex.test(item.title)).map((channel) => (
+                {channels && channels.filter((item) => searchRegex.test(item.title)).map((channel) => (
                     <ChannelComponent
-                        {...{ channel }}
+                        {...channel}
                         key={channel.id}
                     />
                 ))}
