@@ -1,7 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcrypt";
-import withMiddleware, { NextApiUserRequest } from "../../../lib/middlewares";
+import withMiddleware from "../../../lib/middlewares";
+import { exclude } from "../../../lib/prismaUtils";
+import { NextApiUserRequest } from "../../../lib/types";
 
 const prisma = new PrismaClient();
 
@@ -22,7 +24,9 @@ export default async function handler(
 const getUsers = withMiddleware("withAuth")(
   async (req: NextApiUserRequest, res: NextApiResponse) => {
     try {
-      const users = await prisma.user.findMany();
+      const users = (await prisma.user.findMany()).map((user) =>
+        exclude(user, "password")
+      );
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json(error);
@@ -32,10 +36,15 @@ const getUsers = withMiddleware("withAuth")(
 
 const addUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const { firstName, lastName, email, password } = req.body;
-  console.log(req.body);
 
   try {
     const user = await prisma.user.create({
+      include: {
+        roles: true,
+        bikes: true,
+        ownerOnChannels: true,
+        memberOnChannels: true,
+      },
       data: {
         firstName,
         lastName,
@@ -48,7 +57,7 @@ const addUser = async (req: NextApiRequest, res: NextApiResponse) => {
         },
       },
     });
-    res.status(200).json(user);
+    res.status(200).json(exclude(user, "password"));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       res.status(400).json(error);

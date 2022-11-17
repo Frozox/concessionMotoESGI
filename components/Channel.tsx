@@ -1,11 +1,14 @@
 import { Channel } from "@prisma/client"
 import { useRouter } from "next/router"
 
-type IChannel = {
-    channel: Channel
+type IChannel = Channel & {
+    createdAt: string
+    _count: {
+        members: number
+    }
 }
 
-export const ChannelComponent = ({ channel }: IChannel) => {
+export const ChannelComponent = (channel: IChannel) => {
     const router = useRouter()
     return (
         <div
@@ -15,14 +18,14 @@ export const ChannelComponent = ({ channel }: IChannel) => {
         >
             <div className="row-span-4 h-full grid-row-2">
                 <div className="text-lg font-bold items-center">{channel.title}</div>
-                <div className="text-sm italic text-gray-600">{channel.createdAt.toDateString()}</div>
+                <div className="text-sm italic text-gray-600">{channel.createdAt}</div>
             </div>
             <div className="grid-cols-3">
                 <div className="row-span-4 flex justify-center items-center">
-                    <div className="">/{channel.capacity}</div>
+                    <div className="">{channel._count.members}/{channel.capacity}</div>
                 </div>
                 <div className="row-span-4 flex justify-center items-center">
-                    <div className="">{channel.status}</div>
+                    <div className="">{channel.open}</div>
                 </div>
                 <div className="row-span-4 h-full flex justify-end items-end">
                     <span className="p-3 rounded-lg bg-slate-300">Rejoindre</span>

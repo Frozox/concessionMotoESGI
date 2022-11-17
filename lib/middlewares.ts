@@ -1,15 +1,15 @@
 import { label, Middleware } from "next-api-middleware";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import { NextApiRequest } from "next";
+import { NextApiUserRequest } from "./types";
 
 const prisma = new PrismaClient();
 
-export type NextApiUserRequest = NextApiRequest & {
-  user?: any;
-};
-
-export const withAuth: Middleware = async (req: NextApiUserRequest, res, next) => {
+export const withAuth: Middleware = async (
+  req: NextApiUserRequest,
+  res,
+  next
+) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -25,12 +25,10 @@ export const withAuth: Middleware = async (req: NextApiUserRequest, res, next) =
         email,
       },
       include: {
-        roles: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        roles: true,
+        bikes: true,
+        ownerOnChannels: true,
+        memberOnChannels: true,
       },
     });
 
@@ -49,7 +47,6 @@ export const withAuth: Middleware = async (req: NextApiUserRequest, res, next) =
 export const withRoles =
   (...roles: string[]): Middleware =>
   async (req: NextApiUserRequest, res, next) => {
-    console.log("needRoles", roles);
     if (
       !roles.every((role) => req.user.roles.some((r: any) => r.name === role))
     ) {
@@ -58,8 +55,76 @@ export const withRoles =
     return next();
   };
 
+export const withMeInQuery: Middleware = async (
+  req: NextApiUserRequest,
+  res,
+  next
+) => {
+  if (req.query.userId === "me") {
+    req.query.userId = req.user.id;
+  }
+  next();
+};
+
+export const inChannelOrAdmin: Middleware = async (
+  req: NextApiUserRequest,
+  res,
+  next
+) => {
+  if (
+    req.user.memberOnChannels.some((c: any) => c.id === req.query.channelId) ||
+    req.user.roles.some((r: any) => r.name === "ADMIN")
+  ) {
+    return next();
+  }
+  return res.status(401).json({ message: "Unauthorized" });
+};
+
+export const ifMessageAuthorOrAdmin: Middleware = async (
+  req: NextApiUserRequest,
+  res,
+  next
+) => {
+  const message = await prisma.channelMessage.findUnique({
+    where: {
+      id: String(req.query.messageId),
+    },
+  });
+
+  if (
+    message?.authorId === req.user.id ||
+    req.user.roles.some((r: any) => r.name === "ADMIN")
+  ) {
+    return next();
+  }
+  return res.status(401).json({ message: "Unauthorized" });
+};
+
+export const ifDirectMessageAuthorOrReciver: Middleware = async (
+  req: NextApiUserRequest,
+  res,
+  next
+) => {
+  const message = await prisma.directMessage.findUnique({
+    where: {
+      id: String(req.query.directMessageId),
+    },
+  });
+  if (
+    message?.authorId === req.user.id ||
+    message?.receiverId === req.user.id
+  ) {
+    return next();
+  }
+  return res.status(401).json({ message: "Unauthorized" });
+};
+
 const withMiddleware = label({
   withAuth,
+  withMeInQuery: [withAuth, withMeInQuery],
+  inChannelOrAdmin: [withAuth, inChannelOrAdmin],
+  ifMessageAuthorOrAdmin: [withAuth, ifMessageAuthorOrAdmin],
+  ifDirectMessageAuthorOrReciver: [withAuth, ifDirectMessageAuthorOrReciver],
   isAdmin: [withAuth, withRoles("ADMIN")],
 });
 
