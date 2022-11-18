@@ -73,7 +73,7 @@ const addChannel = withMiddleware("isAdmin")(
           ownerId: req.user.id,
           title,
           capacity,
-          open: open || false,
+          open: open || true,
         },
       });
       res.socket.server.io.emit("channels", "POST", channel);

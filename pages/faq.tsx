@@ -2,12 +2,19 @@ import { Faq } from "@prisma/client";
 import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import React from "react";
 import { Fragment } from "react";
-import { useQuery } from "react-query";
 import { DisclosureComp } from "../components/Disclosure";
+import { getFAQs } from "../helpers/requests/faq";
 
 const FAQ: NextPage = () => {
-    const { data: myFaqs } = useQuery<Faq[]>('faqs', () => fetch('/api/faq').then(res => res.json()))
+    const [myFaqs, setMyFaqs] = React.useState<Faq[]>([]);
+
+    React.useEffect(() => {
+        if (myFaqs.length === 0) {
+            getFAQs().then((res) => res.json().then((data) => setMyFaqs(data)));
+        }
+    }, [myFaqs.length]);
 
     return (
         <Fragment>

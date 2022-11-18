@@ -4,11 +4,10 @@ interface RequestConfig {
     url: string
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
     token?: string
-    payload?: string
+    payload?: any
 }
 
 export const apiRequest = ({ url, method, token, payload }: RequestConfig) => {
-    console.log('apiRequest', BASE_URL, url)
     return fetch(`${BASE_URL}${url}`, {
         method,
         headers: token ? {

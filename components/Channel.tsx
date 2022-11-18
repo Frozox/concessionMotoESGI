@@ -4,6 +4,7 @@ import { Fragment } from "react"
 import { BsDoorClosed, BsDoorOpen, BsPeople } from 'react-icons/bs'
 import { GoPrimitiveDot } from 'react-icons/go'
 import { useAuth } from "../helpers/context/User"
+import { handleLeaveChannel, handleJoinChannel } from "../helpers/requests/forum"
 
 export type IChannel = Channel & {
     createdAt: string
@@ -15,26 +16,8 @@ export type IChannel = Channel & {
 
 export const ChannelComponent = (channel: IChannel) => {
     const router = useRouter()
-    const { auth } = useAuth()
+    const { auth: { token, user } } = useAuth()
 
-    const handleJoinChannel = async (channelId: string) => {
-        fetch(`/api/channels/${channelId}/join`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-    }
-    const handleLeaveChannel = async (channelId: string) => {
-        fetch(`/api/channels/${channelId}/leave`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-    }
     return (
         <div
             key={channel.id}
@@ -68,23 +51,29 @@ export const ChannelComponent = (channel: IChannel) => {
                 </div>
             </div>
             <div className="h-full flex justify-end items-end">
-                {channel.open ?
-                    channel.members.find((member: User) => member.id === auth.user?.id) ? (
-                        <div aria-disabled className="p-3 rounded-lg min-w-[120px] border flex justify-center items-center bg-[#292929] group-hover:text-white hover:bg-red-500" onClick={() => handleLeaveChannel(channel.id)}>
-                            Quitter
-                        </div>
-                    ) : (
-                        <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-green-500 hover:text-white`} onClick={() => handleJoinChannel(channel.id)}>
-                            <BsDoorOpen className="" />
-                            <span>Rejoindre</span>
-                        </div>
-                    )
-                    : (
-                        <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-red-500 hover:text-white cursor-not-allowed`}>
-                            <BsDoorClosed className="" />
-                            <span>Fermé</span>
-                        </div>
-                    )}
+                {token ? (
+                    channel.open ?
+                        channel.members.find((member: User) => member.id === user?.id) ? (
+                            <div aria-disabled className="p-3 rounded-lg min-w-[120px] border flex justify-center items-center bg-[#292929] group-hover:text-white hover:bg-red-500" onClick={() => handleLeaveChannel(channel.id, token)}>
+                                Quitter
+                            </div>
+                        ) : (
+                            <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-green-500 hover:text-white`} onClick={() => handleJoinChannel(channel.id, token)}>
+                                <BsDoorOpen className="" />
+                                <span>Rejoindre</span>
+                            </div>
+                        )
+                        : (
+                            <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-red-500 hover:text-white cursor-not-allowed`}>
+                                <BsDoorClosed className="" />
+                                <span>Fermé</span>
+                            </div>
+                        )
+                ) : (
+                    <div className={`p-3 rounded-lg bg-[#fff]/20 min-w-[120px] text-black flex justify-center items-center space-x-1 cursor-not-allowed group-hover:bg-[#26262625]`}>
+                        <span className="text-sm text-white group-hover:text-black">Se connecter</span>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -1,19 +1,30 @@
+import React from "react"
+import { IChannel } from "../../components/Channel"
 import { SelectableItemTable } from "../../components/SelectableItemTable"
+import { getChannels } from "../../helpers/requests/forum"
 import { LayoutAdmin } from "./layout"
 
 const AdminChannels = () => {
-    const channels = [
-        { id: '1', title: "J'ai un probleme avec mon pot d'échapement", members: ['Loan', 'Tom', 'Raph'], capacity: 10, owner: 'Loan CLERIS', createdAt: '03/11/2022', status: true },
-        { id: '2', title: "J'ai pas assez de vitesse que dois-je faire ? ", members: ['Loan', 'Tom', 'Raph'], capacity: 10, owner: 'Tom Cuillandre', createdAt: '04/11/2022', status: false },
-    ]
+    const [channels, setChannels] = React.useState<IChannel[]>([])
+    React.useEffect(() => {
+        if (channels.length === 0) {
+            getChannels().then(res => res.json().then(channel => setChannels(channel)))
+        }
+    }, [channels.length])
     return (
         <LayoutAdmin>
             <div className="space-y-2">
                 {
                     channels.map((channel, index) => (
                         <SelectableItemTable
-                            {...channel}
                             key={index}
+                            title={channel.title}
+                            members={channel.members}
+                            capacity={channel.capacity}
+                            id={channel.id}
+                            owner={channel.ownerId}
+                            createdAt={channel.createdAt}
+                            status={channel.open}
                         />
                     ))
                 }

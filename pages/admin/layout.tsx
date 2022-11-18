@@ -4,8 +4,10 @@ import { useRouter } from "next/router"
 import React, { Fragment } from "react"
 import { useForm } from "react-hook-form"
 import { Modal } from "../../components/Modal"
+import { useAuth } from "../../helpers/context/User"
 import useModal from "../../helpers/hooks/Modal/useModal"
 import { useSession } from "../../helpers/hooks/User/session"
+import { createChannel } from "../../helpers/requests/forum"
 
 export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     const [selectedIndex, setSelectedIndex] = React.useState(0)
@@ -77,20 +79,17 @@ const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [formError, setFormError] = React.useState('');
     const { session } = useSession()
+    const { auth: { user, token } } = useAuth()
     const onSubmit = (data: any) => {
-        fetch('/api/users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(res => {
-            if (res.ok) {
-                modalToggle()
-            } else {
-                setFormError('Something went wrong')
-            }
-        })
+        if (token && user) {
+            createChannel(data, token, user.id).then(res => res.json().then(data => {
+                if (res.ok) {
+                    modalToggle()
+                } else {
+                    setFormError(data.message)
+                }
+            }))
+        }
     }
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -109,7 +108,7 @@ const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
                 {errors.lastname && <span>This field is required</span>}
             </div>
             <div className='flex flex-col'>
-                <input type='text' {...register('owner', { required: true, disabled: true })} className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none text-black' defaultValue={session.user?.firstName + ' ' + session.user?.lastName} />
+                <input type='text' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none text-black' defaultValue={session.user?.firstName + ' ' + session.user?.lastName} />
             </div>
             {formError && <p className='text-red-500'>{formError}</p>}
             <button className='w-full h-10 my-2 bg-blue-400 hover:bg-blue-500 text-white rounded-md justify-center items-center flex cursor-pointer'>
