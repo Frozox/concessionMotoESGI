@@ -1,17 +1,10 @@
 import { Channel } from "@prisma/client"
 import { NextPage } from "next"
 import React, { useEffect } from "react"
-import { ChannelComponent } from "../../components/Channel"
+import { ChannelComponent, IChannel } from "../../components/Channel"
 import { HiOutlineChatAlt2 } from 'react-icons/hi'
 import { AiOutlineStar } from 'react-icons/ai'
 import { io } from "socket.io-client"
-
-type IChannel = Channel & {
-    createdAt: string
-    _count: {
-        members: number
-    }
-}
 
 export const Forum: NextPage = () => {
     const [searchValue, setSearchValue] = React.useState('');

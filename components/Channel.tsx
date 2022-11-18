@@ -1,37 +1,91 @@
-import { Channel } from "@prisma/client"
+import { Channel, User } from "@prisma/client"
 import { useRouter } from "next/router"
+import { Fragment } from "react"
+import { BsDoorClosed, BsDoorOpen, BsPeople } from 'react-icons/bs'
+import { GoPrimitiveDot } from 'react-icons/go'
+import { useAuth } from "../helpers/context/User"
 
-type IChannel = Channel & {
+export type IChannel = Channel & {
     createdAt: string
     _count: {
         members: number
     }
+    members: User[]
 }
 
 export const ChannelComponent = (channel: IChannel) => {
     const router = useRouter()
+    const { auth } = useAuth()
+
+    const handleJoinChannel = async (channelId: string) => {
+        fetch(`/api/channels/${channelId}/join`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+    }
+    const handleLeaveChannel = async (channelId: string) => {
+        fetch(`/api/channels/${channelId}/leave`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+    }
     return (
         <div
             key={channel.id}
-            className="w-full h-32 bg-white rounded-md grid grid-cols-2 items-center cursor-pointer hover:bg-white/90 text-black p-3"
-            onClick={() => router.push(`/forum/${channel.id}`)}
+            className="w-full h-32 bg-[#ffffff25] border border-gray-300 rounded-md cursor-pointer hover:bg-white/90 text-white p-3 hover:text-gray-800 group items-center flex"
         >
-            <div className="row-span-4 h-full grid-row-2">
-                <div className="text-lg font-bold items-center">{channel.title}</div>
-                <div className="text-sm italic text-gray-600">{channel.createdAt}</div>
+            <div className="flex justify-start items-start w-full h-full" onClick={() => router.push(`/forum/${channel.id}`)}>
+                <div className='flex justify-start flex-col'>
+                    <div className="text-lg font-bold items-center min-w-[35rem]">{channel.title}</div>
+                    <div className="text-sm italic text-gray-300 group-hover:text-gray-600">{new Date(channel.createdAt).toLocaleDateString('fr-FR', { dateStyle: 'full' })}</div>
+                </div>
+                <div className="w-full space-x-6 flex justify-start">
+                    <div className="flex justify-center items-center space-x-2">
+                        <span>
+                            {channel._count.members}/{channel.capacity}
+                        </span>
+                        <BsPeople />
+                    </div>
+                    <div className="flex justify-center items-center">
+                        <div className="">{channel.open ? (
+                            <div className="flex space-x-1 items-center">
+                                <span>Ouvert</span>
+                                <GoPrimitiveDot className='text-green-500' />
+                            </div>
+                        ) : (
+                            <div className="flex space-x-1 items-center">
+                                <span>Fermé</span>
+                                <GoPrimitiveDot className="text-red-500" />
+                            </div>
+                        )}</div>
+                    </div>
+                </div>
             </div>
-            <div className="grid-cols-3">
-                <div className="row-span-4 flex justify-center items-center">
-                    <div className="">{channel._count.members}/{channel.capacity}</div>
-                </div>
-                <div className="row-span-4 flex justify-center items-center">
-                    <div className="">{channel.open}</div>
-                </div>
-                <div className="row-span-4 h-full flex justify-end items-end">
-                    <span className="p-3 rounded-lg bg-slate-300">Rejoindre</span>
-                </div>
+            <div className="h-full flex justify-end items-end">
+                {channel.open ?
+                    channel.members.find((member: User) => member.id === auth.user?.id) ? (
+                        <div aria-disabled className="p-3 rounded-lg min-w-[120px] border flex justify-center items-center bg-[#292929] group-hover:text-white hover:bg-red-500" onClick={() => handleLeaveChannel(channel.id)}>
+                            Quitter
+                        </div>
+                    ) : (
+                        <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-green-500 hover:text-white`} onClick={() => handleJoinChannel(channel.id)}>
+                            <BsDoorOpen className="" />
+                            <span>Rejoindre</span>
+                        </div>
+                    )
+                    : (
+                        <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-red-500 hover:text-white cursor-not-allowed`}>
+                            <BsDoorClosed className="" />
+                            <span>Fermé</span>
+                        </div>
+                    )}
             </div>
-
         </div>
     )
 

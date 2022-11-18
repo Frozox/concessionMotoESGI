@@ -24,6 +24,11 @@ const getChannels = async (req: NextApiUserRequest, res: NextApiResponse) => {
   try {
     const channels = await prisma.channel.findMany({
       include: {
+        members: {
+          select: {
+            id: true,
+          },
+        },
         _count: {
           select: {
             members: true,
@@ -50,6 +55,11 @@ const addChannel = withMiddleware("isAdmin")(
               firstName: true,
               lastName: true,
               online: true,
+            },
+          },
+          members: {
+            select: {
+              id: true,
             },
           },
           _count: {
