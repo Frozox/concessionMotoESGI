@@ -10,30 +10,29 @@ import { AlertPopHover } from "./AlertPopHover"
 import { useAlert } from "../helpers/hooks/Alert/useAlert"
 import { Avatar } from "./Avatar"
 import { getInitial } from "../helpers/helper"
-import { useSession } from "../helpers/hooks/User/session"
-import { AuthContextType } from "../helpers/context/User"
+import { useAuth } from "../helpers/context/User"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
     const { isShowing, toggle } = useModal()
     const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
     const { showAlert, toggleAlert } = useAlert()
     const [show, setShow] = React.useState(false)
-    const { session } = useSession()
+    const { auth: { token, isAdmin, user } } = useAuth()
 
     const myLinks = [
         { href: "/forum", label: "Forum", visible: true },
         { href: "/counslor", label: "Assistance", visible: true },
         { href: "/faq", label: "FAQ", visible: true },
-        { href: "/admin", label: "Administration", visible: session.isAdmin },
+        { href: "/admin", label: "Administration", visible: isAdmin },
     ]
 
     React.useEffect(() => {
-        if (session.token) {
+        if (token) {
             setShow(true)
         } else {
             setShow(false)
         }
-    }, [session.token])
+    }, [token])
 
     return (
         <Fragment>
@@ -102,7 +101,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 ) : (
                                     <Avatar
                                         indicator={2}
-                                        userLetters={getInitial(session.user?.firstName + ' ' + session.user?.lastName)}
+                                        userLetters={getInitial(user?.firstName + ' ' + user?.lastName)}
                                     />
                                 )}
                             </motion.div>

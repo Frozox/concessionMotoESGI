@@ -12,6 +12,7 @@ export type AuthContextType = {
     isAdmin: boolean;
     setToken: React.Dispatch<React.SetStateAction<string | null>>;
     setUser: React.Dispatch<React.SetStateAction<UserJWT | null>>;
+    closeSession: () => void;
 };
 
 
@@ -22,6 +23,7 @@ const AuthContext = React.createContext<{ auth: AuthContextType }>({
         isAdmin: false,
         setToken: () => null,
         setUser: () => null,
+        closeSession: () => null,
     },
 })
 
@@ -30,6 +32,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = React.useState<UserJWT | null>(null)
     const valueToWatch = typeof window !== 'undefined' && localStorage.getItem('token')
     const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || false
+
+    const closeSession = () => {
+        console.log('closeSession');
+
+        setToken(null)
+        setUser(null)
+        localStorage.removeItem('token')
+    }
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -44,7 +54,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [valueToWatch, typeof window, token])
 
     return (
-        <AuthContext.Provider value={{ auth: { user, token, isAdmin, setToken, setUser } }}>
+        <AuthContext.Provider value={{ auth: { user, token, isAdmin, setToken, setUser, closeSession } }}>
             {children}
         </AuthContext.Provider>
     )
