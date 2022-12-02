@@ -3,10 +3,9 @@ import { Server as ServerIO } from "socket.io";
 import { Server as NetServer } from "http";
 import { NextApiResponseServerIO } from "../../lib/types";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-import { exclude } from "../../lib/prismaUtils";
+import { exclude, PrismaClientSingleton } from "../../lib/prismaUtils";
 
-const prisma = new PrismaClient();
+const prisma = PrismaClientSingleton.getInstance().prisma;
 
 export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
   if (res.socket.server.io) {

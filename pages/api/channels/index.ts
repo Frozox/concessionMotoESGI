@@ -1,9 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import withMiddleware from "../../../lib/middlewares";
+import { PrismaClientSingleton } from "../../../lib/prismaUtils";
 import { NextApiResponseServerIO, NextApiUserRequest } from "../../../lib/types";
 
-const prisma = new PrismaClient();
+const prisma = PrismaClientSingleton.getInstance().prisma;
 
 export default async function handler(
   req: NextApiRequest,

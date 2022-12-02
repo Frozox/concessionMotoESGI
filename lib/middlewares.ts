@@ -1,9 +1,9 @@
 import { label, Middleware } from "next-api-middleware";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import { NextApiUserRequest } from "./types";
+import { PrismaClientSingleton } from "./prismaUtils";
 
-const prisma = new PrismaClient();
+const prisma = PrismaClientSingleton.getInstance().prisma;
 
 export const withAuth: Middleware = async (
   req: NextApiUserRequest,
