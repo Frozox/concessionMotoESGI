@@ -4,7 +4,7 @@ import LayoutMessages from "./layout";
 const MyMessages: NextPage = () => {
     return (
         <LayoutMessages userIdSelected={null}>
-            <div>
+            <div className="mx-auto">
                 <p className="text-white">Aucune conversation sélectionnée</p>
             </div>
         </LayoutMessages>

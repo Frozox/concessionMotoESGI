@@ -39,7 +39,7 @@ const getDirectMessages = withMiddleware("withAuth")(
           ],
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       });
       res.status(200).json(directMessages);

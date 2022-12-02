@@ -1,7 +1,7 @@
 import { Channel } from "@prisma/client"
 import { useRouter } from "next/router"
 import React, { Fragment } from "react"
-import { CommentComponent } from "../../components/Message"
+import { CommentComponent, MessageComponent } from "../../components/Message"
 import { useAuth } from "../../helpers/context/User"
 import { getChannelById } from "../../helpers/requests/forum"
 
@@ -28,7 +28,11 @@ export const ChannelPage = () => {
                             <h1 className="text-4xl">{channelData?.title}</h1>
                             <span>{new Date(channelData?.createdAt).toLocaleDateString()}</span>
                             <div className="h-full min-h-[30rem] mt-5 border rounded-md p-3 overflow-scroll space-y-2">
-                                <CommentComponent />
+                                <CommentComponent
+                                    user={{ firstName: 'Loan', lastName: 'CLERIS' }}
+                                    createdAt={new Date()}
+                                    content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod."
+                                />
                             </div>
                         </div>
                     )}
