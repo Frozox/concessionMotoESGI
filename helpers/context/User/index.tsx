@@ -1,6 +1,6 @@
 import jwt_decode from "jwt-decode";
 import { Role, User } from "@prisma/client"
-import React from "react";
+import React, { useCallback } from "react";
 
 export type UserJWT = User & {
     roles: Role[];
@@ -31,11 +31,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const valueToWatch = typeof window !== 'undefined' && localStorage.getItem('token')
     const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || false
 
-    const closeSession = () => {
+    const closeSession = useCallback(() => {
         setToken(null)
         setUser(null)
         localStorage.removeItem('token')
-    }
+    }, [])
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
