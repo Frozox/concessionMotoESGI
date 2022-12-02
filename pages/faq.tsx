@@ -1,13 +1,20 @@
+import { Faq } from "@prisma/client";
 import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import React from "react";
 import { Fragment } from "react";
-import { useQuery } from "react-query";
 import { DisclosureComp } from "../components/Disclosure";
-import { IDisclosure } from "./api/disclosure";
+import { getFAQs } from "../helpers/requests/faq";
 
 const FAQ: NextPage = () => {
-    const { data: myFaqs } = useQuery<IDisclosure[]>('faqs', () => fetch('/api/faq').then(res => res.json()))
+    const [myFaqs, setMyFaqs] = React.useState<Faq[]>([]);
+
+    React.useEffect(() => {
+        if (myFaqs.length === 0) {
+            getFAQs().then((res) => res.json().then((data) => setMyFaqs(data)));
+        }
+    }, [myFaqs.length]);
 
     return (
         <Fragment>
@@ -16,7 +23,7 @@ const FAQ: NextPage = () => {
             </Head>
             <div className='w-full p-5'>
                 <div className='w-full bg-white rounded-xl p-3 space-y-3'>
-                    {myFaqs && myFaqs.map((faq: IDisclosure, index: number) => (
+                    {myFaqs && myFaqs.map((faq: Faq, index: number) => (
                         <DisclosureComp value={faq} key={index} />
                     ))}
                     <div className='flex justify-center'>

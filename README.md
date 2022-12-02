@@ -29,4 +29,3 @@ if the database has no data :
 -   [Socket IO](https://socket.io/)
 -   [React Hook Form](https://react-hook-form.com/)
 -   [PG](https://www.npmjs.com/package/pg)
--   [React Query](https://react-query-v3.tanstack.com/)

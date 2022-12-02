@@ -1,19 +1,14 @@
 import { useRouter } from "next/router";
 import React from "react"
 import { useForm } from "react-hook-form";
+import { loginRequest } from "../helpers/requests/authentication";
 
 export const Login = ({ modalToggle }: { modalToggle: () => void }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [formError, setFormError] = React.useState('');
     const router = useRouter()
     const onSubmit = (data: any) => {
-        fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(res => {
+        loginRequest(data).then(res => {
             if (res.ok) {
                 res.json().then(data => {
                     localStorage.setItem('token', data.token)
@@ -23,7 +18,8 @@ export const Login = ({ modalToggle }: { modalToggle: () => void }) => {
             } else {
                 setFormError('Votre identifiant ou mot de passe est incorrect')
             }
-        })
+        }
+        )
     }
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {

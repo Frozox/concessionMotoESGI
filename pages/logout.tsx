@@ -1,12 +1,11 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useSession } from "../helpers/hooks/User/session";
 import { useAuth } from "../helpers/context/User";
 import { NextPage } from "next";
 
 const Logout: NextPage = () => {
     const router = useRouter();
-    const { closeSession } = useSession();
+    const { closeSession } = useAuth();
     useEffect(() => {
         if (router.pathname === '/logout') {
             closeSession();

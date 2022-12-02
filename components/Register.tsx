@@ -1,18 +1,13 @@
 import React from 'react';
 import { useForm } from 'react-hook-form'
 import useModal from '../helpers/hooks/Modal/useModal';
+import { registerRequest } from '../helpers/requests/authentication';
 
 export const Register = ({ modalToggle }: { modalToggle: () => void }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [formError, setFormError] = React.useState('');
     const onSubmit = (data: any) => {
-        fetch('/api/users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then(res => {
+        registerRequest(data).then(res => {
             if (res.ok) {
                 modalToggle()
             } else {

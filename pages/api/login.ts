@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { PrismaClientSingleton } from "../../lib/prismaUtils";
 
-const prisma = new PrismaClient();
+const prisma = PrismaClientSingleton.getInstance().prisma;
 
 /**
  * It takes a request and a response, and if the request method is POST, it calls the jwtAuth function,

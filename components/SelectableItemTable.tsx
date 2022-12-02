@@ -6,10 +6,12 @@ import { BiEdit } from 'react-icons/bi'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import React from "react"
-import { useSession } from "../helpers/hooks/User/session"
+import { updateChannel } from "../helpers/requests/forum"
+import { useAuth } from "../helpers/context/User"
+import { User } from "@prisma/client"
 export interface IItemTableProps {
     title: string
-    members: string[]
+    members: User[]
     capacity: number
     id: string
     owner: string
@@ -25,7 +27,7 @@ export const SelectableItemTable = (
     const handleStatus = () => {
         console.log('status', !status);
     }
-    const { session } = useSession()
+    const { user } = useAuth()
     return (
         <Fragment>
             <div
@@ -70,7 +72,7 @@ export const SelectableItemTable = (
                 yesNoAction={
                     [{
                         text: "Enregistrer",
-                        action: () => console.log("Update"),
+                        action: () => console.log("Update"), //! Need to trigger update from here
                         type: 'yes'
                     },
                     {
@@ -85,7 +87,7 @@ export const SelectableItemTable = (
                         members={members}
                         capacity={capacity}
                         id={id}
-                        owner={session.user?.firstName + ' ' + session.user?.lastName}
+                        owner={user?.firstName + ' ' + user?.lastName}
                         status={status}
                         createdAt={createdAt}
                     />
@@ -114,16 +116,14 @@ export const SelectableItemTable = (
     )
 }
 
-export const HandleFormUpdate = ({ title, capacity, owner }: IItemTableProps) => {
+export const HandleFormUpdate = ({ title, capacity, owner, id }: IItemTableProps) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
+    const { token, user } = useAuth()
+
     const onSubmit = (data: any) => {
-        fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
+        if (token) {
+            updateChannel(data, token, id).then(res => res.json().then(res => console.log(res)))
+        }
     }
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -141,7 +141,7 @@ export const HandleFormUpdate = ({ title, capacity, owner }: IItemTableProps) =>
                 {errors.lastname && <span>This field is required</span>}
             </div>
             <div className='flex flex-col'>
-                <input type='text' {...register('owner', { required: true })} placeholder='Propriétaire' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none' defaultValue={owner} />
+                <input type='text' placeholder='Propriétaire' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none' defaultValue={owner} />
                 {errors.email && <span>This field is required</span>}
             </div>
         </form>

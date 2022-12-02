@@ -1,9 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import withMiddleware from "../../../lib/middlewares";
-import { NextApiUserRequest } from "../../../lib/types";
+import { PrismaClientSingleton } from "../../../lib/prismaUtils";
+import { NextApiResponseServerIO, NextApiUserRequest } from "../../../lib/types";
 
-const prisma = new PrismaClient();
+const prisma = PrismaClientSingleton.getInstance().prisma;
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,27 +20,30 @@ export default async function handler(
   }
 }
 
-const getChannels = withMiddleware("withAuth")(
-  async (req: NextApiUserRequest, res: NextApiResponse) => {
-    try {
-      const channels = await prisma.channel.findMany({
-        include: {
-          _count: {
-            select: {
-              members: true,
-            },
+const getChannels = async (req: NextApiUserRequest, res: NextApiResponse) => {
+  try {
+    const channels = await prisma.channel.findMany({
+      include: {
+        members: {
+          select: {
+            id: true,
           },
         },
-      });
-      res.status(200).json(channels);
-    } catch (error) {
-      res.status(500).json(error);
-    }
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+    });
+    res.status(200).json(channels);
+  } catch (error) {
+    res.status(500).json(error);
   }
-);
+};
 
 const addChannel = withMiddleware("isAdmin")(
-  async (req: NextApiUserRequest, res: NextApiResponse) => {
+  async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
     const { title, capacity, open } = req.body;
 
     try {
@@ -53,6 +57,11 @@ const addChannel = withMiddleware("isAdmin")(
               online: true,
             },
           },
+          members: {
+            select: {
+              id: true,
+            },
+          },
           _count: {
             select: {
               members: true,
@@ -64,9 +73,10 @@ const addChannel = withMiddleware("isAdmin")(
           ownerId: req.user.id,
           title,
           capacity,
-          open: open || false,
+          open: open || true,
         },
       });
+      res.socket.server.io.emit("channels", "POST", channel);
       res.status(200).json(channel);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

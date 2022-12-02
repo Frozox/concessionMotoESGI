@@ -1,6 +1,6 @@
 import jwt_decode from "jwt-decode";
 import { Role, User } from "@prisma/client"
-import React from "react";
+import React, { useCallback } from "react";
 
 export type UserJWT = User & {
     roles: Role[];
@@ -12,17 +12,17 @@ export type AuthContextType = {
     isAdmin: boolean;
     setToken: React.Dispatch<React.SetStateAction<string | null>>;
     setUser: React.Dispatch<React.SetStateAction<UserJWT | null>>;
+    closeSession: () => void;
 };
 
 
-const AuthContext = React.createContext<{ auth: AuthContextType }>({
-    auth: {
-        user: null,
-        token: null,
-        isAdmin: false,
-        setToken: () => null,
-        setUser: () => null,
-    },
+const AuthContext = React.createContext<AuthContextType>({
+    user: null,
+    token: null,
+    isAdmin: false,
+    setToken: () => null,
+    setUser: () => null,
+    closeSession: () => null,
 })
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -30,6 +30,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = React.useState<UserJWT | null>(null)
     const valueToWatch = typeof window !== 'undefined' && localStorage.getItem('token')
     const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || false
+
+    const closeSession = useCallback(() => {
+        setToken(null)
+        setUser(null)
+        localStorage.removeItem('token')
+    }, [])
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -43,8 +49,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [valueToWatch, typeof window, token])
 
+    const value = React.useMemo(() => ({
+        user,
+        token,
+        isAdmin,
+        setToken,
+        setUser,
+        closeSession,
+    }), [user, token, isAdmin, setToken, setUser, closeSession])
+
     return (
-        <AuthContext.Provider value={{ auth: { user, token, isAdmin, setToken, setUser } }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )
