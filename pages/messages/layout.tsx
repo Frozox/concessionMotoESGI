@@ -1,17 +1,24 @@
 import { User } from "@prisma/client";
 import { ContactComponent } from "../../components/Contact"
 import { useEffect, useState } from "react";
+import { getContacts } from "../../helpers/requests/contact";
+import { useAuth } from "../../helpers/context/User";
 
 const LayoutMessages = ({ children, userIdSelected }: { children: JSX.Element, userIdSelected: String | null }) => {
     const [searchValue, setSearchValue] = useState('');
     const searchRegex = new RegExp(searchValue, 'i');
     const [contacts, setContacts] = useState<User[]>([])
+    const { token } = useAuth()
 
     useEffect(() => {
-        if (contacts.length < 1) {
-            fetch('/api/users/contacts', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }).then(res => res.json()).then(setContacts);
+        if (contacts.length < 1 && token) {
+            getContacts(token).then(res => res.json().then(data => {
+                if (res.ok) {
+                    setContacts(data)
+                }
+            }))
         }
-    }, [contacts.length]);
+    }, [contacts.length, token]);
 
     return (
         <div className="w-full h-full py-5 flex justify-start items-center relative">
