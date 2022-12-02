@@ -16,7 +16,7 @@ export type IChannel = Channel & {
 
 export const ChannelComponent = (channel: IChannel) => {
     const router = useRouter()
-    const { auth: { token, user } } = useAuth()
+    const { token, user } = useAuth()
 
     return (
         <div

@@ -12,7 +12,7 @@ export const Forum: NextPage = () => {
     const [searchValue, setSearchValue] = React.useState('');
     const searchRegex = new RegExp(searchValue, 'i');
     const [channels, setChannels] = React.useState<IChannel[]>([])
-    const { auth: { token } } = useAuth()
+    const { token } = useAuth()
 
     React.useEffect(() => {
         getChannels().then(res => res.json().then(channel => setChannels(channel)))

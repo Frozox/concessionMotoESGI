@@ -5,7 +5,7 @@ import { NextPage } from "next";
 
 const Logout: NextPage = () => {
     const router = useRouter();
-    const { auth: { closeSession } } = useAuth();
+    const { closeSession } = useAuth();
     useEffect(() => {
         if (router.pathname === '/logout') {
             closeSession();

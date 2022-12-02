@@ -16,15 +16,13 @@ export type AuthContextType = {
 };
 
 
-const AuthContext = React.createContext<{ auth: AuthContextType }>({
-    auth: {
-        user: null,
-        token: null,
-        isAdmin: false,
-        setToken: () => null,
-        setUser: () => null,
-        closeSession: () => null,
-    },
+const AuthContext = React.createContext<AuthContextType>({
+    user: null,
+    token: null,
+    isAdmin: false,
+    setToken: () => null,
+    setUser: () => null,
+    closeSession: () => null,
 })
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -34,8 +32,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || false
 
     const closeSession = () => {
-        console.log('closeSession');
-
         setToken(null)
         setUser(null)
         localStorage.removeItem('token')
@@ -53,8 +49,17 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [valueToWatch, typeof window, token])
 
+    const value = React.useMemo(() => ({
+        user,
+        token,
+        isAdmin,
+        setToken,
+        setUser,
+        closeSession,
+    }), [user, token, isAdmin, setToken, setUser, closeSession])
+
     return (
-        <AuthContext.Provider value={{ auth: { user, token, isAdmin, setToken, setUser, closeSession } }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     )

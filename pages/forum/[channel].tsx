@@ -7,7 +7,7 @@ import { getChannelById } from "../../helpers/requests/forum"
 export const ChannelPage = () => {
     const router = useRouter()
     const { channel } = router.query
-    const { auth: { token } } = useAuth()
+    const { token } = useAuth()
 
     const [channelData, setChannelData] = React.useState<Channel | null>(null)
 
@@ -20,8 +20,13 @@ export const ChannelPage = () => {
 
     return (
         <div className="px-36 py-5">
-            <div className="">
-                <h1 className="text-4xl">{channelData?.title}</h1>
+            <div className="bg-white text-gray-700 h-[10rem] rounded-lg p-3">
+                {channelData && (
+                    <Fragment>
+                        <h1 className="text-4xl">{channelData?.title}</h1>
+                        <span>{new Date(channelData?.createdAt).toLocaleDateString()}</span>
+                    </Fragment>
+                )}
             </div>
         </div>
     )

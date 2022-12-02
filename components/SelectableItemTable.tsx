@@ -27,7 +27,7 @@ export const SelectableItemTable = (
     const handleStatus = () => {
         console.log('status', !status);
     }
-    const { auth: { user } } = useAuth()
+    const { user } = useAuth()
     return (
         <Fragment>
             <div
@@ -118,7 +118,7 @@ export const SelectableItemTable = (
 
 export const HandleFormUpdate = ({ title, capacity, owner, id }: IItemTableProps) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { auth: { token, user } } = useAuth()
+    const { token, user } = useAuth()
 
     const onSubmit = (data: any) => {
         if (token) {

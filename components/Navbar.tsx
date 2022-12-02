@@ -17,7 +17,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
     const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
     const { showAlert, toggleAlert } = useAlert()
     const [show, setShow] = React.useState(false)
-    const { auth: { token, isAdmin, user } } = useAuth()
+    const { token, isAdmin, user } = useAuth()
 
     const myLinks = [
         { href: "/forum", label: "Forum", visible: true },

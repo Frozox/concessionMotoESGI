@@ -17,7 +17,7 @@ export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     ]
     const router = useRouter()
     const { toggle, isShowing } = useModal()
-    const { auth: { isAdmin } } = useAuth()
+    const { isAdmin } = useAuth()
 
     React.useEffect(() => {
         if (!isAdmin) {
@@ -73,7 +73,7 @@ const TableList = ({ title, link }: { title: string, link: string }) => {
 const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [formError, setFormError] = React.useState('');
-    const { auth: { user, token } } = useAuth()
+    const { user, token } = useAuth()
     const onSubmit = (data: any) => {
         if (token && user) {
             createChannel(data, token, user.id).then(res => res.json().then(data => {
