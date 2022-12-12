@@ -25,6 +25,8 @@ const getDirectMessages = withMiddleware("withAuth")(
       return res.status(401).json({ message: "Unauthorized" });
     }
     try {
+      const { take, beforeCreatedAt } = req.query as { take?: string; beforeCreatedAt?: string }
+
       const directMessages = await prisma.directMessage.findMany({
         where: {
           OR: [
@@ -37,10 +39,14 @@ const getDirectMessages = withMiddleware("withAuth")(
               receiverId: req.user.id,
             },
           ],
+          createdAt: {
+            lt: beforeCreatedAt ? new Date(beforeCreatedAt) : undefined,
+          },
         },
         orderBy: {
-          createdAt: "asc",
+          createdAt: "desc",
         },
+        take: take ? Math.min(Math.max(Number(take), 0), 10) : 5,
       });
       res.status(200).json(directMessages);
     } catch (error) {

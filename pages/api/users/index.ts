@@ -24,9 +24,27 @@ export default async function handler(
 const getUsers = withMiddleware("withAuth")(
   async (req: NextApiUserRequest, res: NextApiResponse) => {
     try {
-      const users = (await prisma.user.findMany()).map((user) =>
-        exclude(user, "password")
-      );
+      const { match } = req.query as { match: string };
+      const users = (
+        await prisma.user.findMany({
+          where: {
+            OR: [
+              {
+                firstName: {
+                  contains: match,
+                  mode: "insensitive",
+                },
+              },
+              {
+                lastName: {
+                  contains: match,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+        })
+      ).map((user) => exclude(user, "password"));
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json(error);
