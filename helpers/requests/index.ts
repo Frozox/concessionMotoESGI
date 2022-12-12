@@ -5,10 +5,15 @@ interface RequestConfig {
     method: 'GET' | 'POST' | 'PATCH' | 'DELETE'
     token?: string
     payload?: any
+    params?: any
 }
 
-export const apiRequest = ({ url, method, token, payload }: RequestConfig) => {
-    return fetch(`${BASE_URL}${url}`, {
+export const apiRequest = ({ url, method, token, payload, params }: RequestConfig) => {
+    const searchUrl = new URL(`${BASE_URL}${url}`);
+    if (params) {
+        searchUrl.search = new URLSearchParams(params).toString();
+    }
+    return fetch(searchUrl, {
         method,
         headers: token ? {
             'Content-Type': 'application/json',

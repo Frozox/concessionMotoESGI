@@ -8,10 +8,22 @@ export const getContacts = (token: string) => {
   });
 };
 
-export const getContactMessages = (token: string, $userId: string) => {
+export const getContactMessages = (token: string, userId: string, params?: string[]|string|object) => {
   return apiRequest({
-    url: `/users/${$userId}/messages`,
+    url: `/users/${userId}/messages`,
     token,
-    method: "GET",
+	method: "GET",
+	params
   });
 };
+
+export const sendContactMessage = (token: string, userId: string, content: string) => {
+  return apiRequest({
+	url: `/users/${userId}/messages`,
+    token,
+    method: "POST",
+    payload: {
+      content 
+    },
+  })
+}

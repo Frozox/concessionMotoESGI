@@ -5,7 +5,7 @@ const MyMessages: NextPage = () => {
     return (
         <LayoutMessages userIdSelected={null}>
             <div className="mx-auto">
-                <p className="text-white">Aucune conversation sélectionnée</p>
+                <p className="text-white">Aucune discussion sélectionnée</p>
             </div>
         </LayoutMessages>
     )
