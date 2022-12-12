@@ -15,6 +15,14 @@ export const getChannels = () => {
     })
 }
 
+export const getChannelMessages = (id: string, token: string) => {
+    return apiRequest({
+        url: `/channels/${id}/messages`,
+        method: 'GET',
+        token
+    })
+}
+
 export const createChannel = (data: any, token: string, ownerId: string) => {
     const { title, capacity } = data
     return apiRequest({
@@ -25,6 +33,18 @@ export const createChannel = (data: any, token: string, ownerId: string) => {
             title,
             capacity: parseInt(capacity),
             ownerId
+        }
+    })
+}
+
+export const createMessage = (data: any, token: string, channelId: string) => {
+    const { content } = data
+    return apiRequest({
+        url: `/channels/${channelId}/messages`,
+        method: 'POST',
+        token,
+        payload: {
+            content
         }
     })
 }
