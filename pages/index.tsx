@@ -6,6 +6,8 @@ import Artcle2 from '../public/article2.jpeg'
 import { Article } from '../components/Article'
 import { FiArrowDownCircle } from 'react-icons/fi'
 import Link from 'next/link'
+import React from 'react'
+import { ChatBot } from '../components/ChatBot'
 
 const Home: NextPage = () => {
     const articles = [
@@ -13,6 +15,7 @@ const Home: NextPage = () => {
         { title: 'Nos concessionnaires', description: "Avec autant d'années d'expérience, notre entreprise est à votre disposition pour conseil technique de haute qualité.", img: Artcle2, link: 'https://www.suzuki-moto.com/concessionnaires' },
         { title: 'Nos nouveautés', description: 'Découvrez nos derniers modèles qui vous feront vriez', img: Artcle1, link: 'https://www.suzuki-moto.com/nouveautes' },
     ]
+    const [isShowing, setIsShowing] = React.useState(false)
     return (
         <div className='flex h-full flex-col'>
             <Head>
@@ -23,6 +26,20 @@ const Home: NextPage = () => {
                 <header
                     className="flex items-center justify-center h-[80vh] mb-12 bg-fixed bg-center bg-cover bg-[url('/bg-homepage.jpeg')]"
                 />
+                <div className='fixed bg-white right-8 bottom-8'>
+                    <div className={`${isShowing ? 'bg-white text-black' : 'hidden'} rounded-xl absolute right-20 bottom-20 w-[70vh] h-[50vh] overflow-scroll`}>
+                        <ChatBot steps={[
+                            { id: 1, message: 'Bonjour, je suis Amin, votre assistant virtuel', sendAt: new Date() },
+                            { id: 2, message: 'Que puis-je faire pour vous ?', sendAt: new Date() },
+                        ]}
+                            botName='Amin assistant virtuel'
+                            isOpen={isShowing}
+                        />
+                    </div>
+                    <div className="h-20 w-20 rounded-full bg-[url('/amin_bot.png')] bg-cover bg-center absolute right-2 bottom-2 bg-white shadow-lg cursor-pointer"
+                        onClick={() => setIsShowing(!isShowing)}
+                    />
+                </div>
                 <a href='#article-section' className='relative bottom-8 w-full flex justify-center'>
                     <FiArrowDownCircle className='animate-bounce text-white w-10 h-10 cursor-pointer absolute' />
                 </a>

@@ -18,10 +18,10 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
     const { showAlert, toggleAlert } = useAlert()
     const [show, setShow] = React.useState(false)
     const { token, isAdmin, user } = useAuth()
+    const [isShowingMobile, setIsShowingMobile] = React.useState(false)
 
     const myLinks = [
         { href: "/forum", label: "Forum", visible: true },
-        { href: "/counslor", label: "Assistance", visible: true },
         { href: "/faq", label: "FAQ", visible: true },
         { href: "/admin", label: "Administration", visible: isAdmin },
     ]
@@ -66,7 +66,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                 </svg>
                             </button>
                         </div>
-                        <div className='w-full block flex-grow lg:flex lg:items-center lg:w-auto'>
+                        <div className='w-full md:block flex-grow lg:flex lg:items-center lg:w-auto hidden'>
                             <motion.div
                                 initial={{ opacity: 0, x: -100 }}
                                 animate={{ opacity: 1, x: 0 }}
