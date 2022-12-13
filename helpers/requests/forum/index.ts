@@ -15,11 +15,12 @@ export const getChannels = () => {
     })
 }
 
-export const getChannelMessages = (id: string, token: string) => {
+export const getChannelMessages = (id: string, token: string, params?: string[]|string|object) => {
     return apiRequest({
         url: `/channels/${id}/messages`,
         method: 'GET',
-        token
+        token,
+        params
     })
 }
 

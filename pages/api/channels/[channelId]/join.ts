@@ -50,6 +50,11 @@ const updateChannel = withMiddleware("withAuth")(
                 },
             });
             if (channel) {
+                res.socket.server.io.sockets.sockets.forEach((socket) => {
+                    if(socket.data.user && socket.data.user.id === req.user.id) {
+                        return socket.join("channel_" + channel.id);
+                    }
+                })
                 res.socket.server.io.emit("channels", "PATCH", channel);
                 res.status(200).json(channel);
             } else {

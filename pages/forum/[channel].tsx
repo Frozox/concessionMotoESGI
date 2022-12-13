@@ -7,49 +7,58 @@ import { ChannelSkeleton } from "../../components/Skeleton"
 import { useAuth } from "../../helpers/context/User"
 import { createMessage, getChannelById, getChannelMessages } from "../../helpers/requests/forum"
 
-interface MessageCustomProps extends ChannelMessage {
+type MessageCustomProps = ChannelMessage & {
     author: {
         firstName: string
         lastName: string
     }
 }
 
-interface ChannelCustomProps extends Channel {
-    messages: MessageCustomProps[]
-}
-
 export const ChannelPage = () => {
     const router = useRouter()
     const { channel } = router.query
-    const { token } = useAuth()
+    const { token, socket } = useAuth()
 
-    const [channelData, setChannelData] = React.useState<ChannelCustomProps | null>(null)
-    const [messages, setMessages] = React.useState<string>('')
     const [isLoading, setIsLoading] = React.useState<boolean>(true)
-    const dataChannel = React.useMemo(() => ({
-        info: channelData,
-    }), [channelData])
+    const [channelMessages, setChannelMessages] = React.useState<MessageCustomProps[]>([])
+    const [chatInputValue, setChatInputValue] = React.useState<string>('')
+    const [dataChannel, setDataChannel] = React.useState<Channel | null>()
 
     React.useEffect(() => {
         if (channel && token) {
-            const requestChannelData = getChannelById(channel as string, token)
-            const requestMessages = getChannelMessages(channel as string, token)
-            Promise.all([requestChannelData, requestMessages]).then(res => {
-                const [channelData, messages] = res
-                channelData.json().then(channelData => {
-                    messages.json().then(messages => {
-                        setChannelData({ ...channelData, messages })
-                        setIsLoading(false)
-                    })
-                })
-            })
+            getChannelById(channel as string, token).then(res => res.json().then(data => {
+                if (res.ok) {
+                    setDataChannel(data)
+                }
+            }));
         }
-    }, [channel])
+    }, [channel, token]);
 
-    const handleSubmit = (data: any) => {
+    React.useEffect(() => {
+        if (dataChannel && token) {
+            getChannelMessages(dataChannel.id, token).then(res => res.json().then(data => {
+                if (res.ok) {
+                    setChannelMessages(data)
+                    setIsLoading(false)
+                }
+            }));
+        }
+    }, [dataChannel])
+
+    React.useEffect(() => {
+        if (!socket) return;
+        socket.removeListener('channelMessage');
+        socket.on('channelMessage', (method: string, message: any) => {
+            if (method === 'POST') {
+                setChannelMessages(prev => [message, ...prev])
+            }
+        });
+    }, [socket])
+
+    const sendMessage = () => {
         if (channel && token) {
-            createMessage(data, token, channel as string)
-            setMessages('')
+            createMessage({ content: chatInputValue }, token, channel as string)
+            setChatInputValue('')
         }
     }
 
@@ -62,32 +71,31 @@ export const ChannelPage = () => {
                     <div className="h-full w-full flex flex-col justify-between">
                         {dataChannel && (
                             <div>
-                                <h1 className="text-4xl">{dataChannel.info?.title}</h1>
-                                <span>{new Date(dataChannel.info?.createdAt as Date).toLocaleDateString()}</span>
-                                <div className="h-full min-h-[30rem] mt-5 border rounded-md p-3 overflow-scroll space-y-2">
-                                    {
-                                        dataChannel.info?.messages.map(message => (
-                                            <Fragment key={message.id}>
-                                                <CommentComponent
-                                                    user={{ firstName: message.author.firstName, lastName: message.author.lastName }}
-                                                    content={message.content}
-                                                    createdAt={message.createdAt}
-                                                />
-                                            </Fragment>
-                                        ))
-                                    }
+                                <h1 className="text-4xl">{dataChannel.title}</h1>
+                                <span>{new Date(dataChannel.createdAt as Date).toLocaleDateString()}</span>
+                                <div className="flex flex-col-reverse justify-start h-full min-h-[30rem] mt-5 border rounded-md p-3 overflow-scroll space-y-2">
+                                    {channelMessages.map(message => (
+                                        <Fragment key={message.id}>
+                                            <CommentComponent
+                                                user={{ firstName: message.author.firstName, lastName: message.author.lastName }}
+                                                content={message.content}
+                                                createdAt={message.createdAt}
+                                            />
+                                        </Fragment>
+                                    ))}
                                 </div>
                             </div>
                         )}
                         <ChatInput
                             placeholder="Mon commentaire..."
                             btnName="Envoyer"
-                            value={messages}
-                            onChange={(e) => setMessages(e.target.value)}
-                            onSubmit={() => handleSubmit({ content: messages })}
+                            value={chatInputValue}
+                            onChange={(e) => setChatInputValue(e.target.value)}
+                            onSubmit={() => sendMessage()}
+                            theme="light"
                             onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSubmit({ content: messages })
+                                if (e.key === 'Enter' && chatInputValue.length > 0) {
+                                    sendMessage()
                                 }
                             }}
                         />

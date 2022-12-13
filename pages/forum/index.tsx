@@ -3,22 +3,23 @@ import React from "react"
 import { ChannelComponent, IChannel } from "../../components/Channel"
 import { HiOutlineChatAlt2 } from 'react-icons/hi'
 import { AiOutlineStar } from 'react-icons/ai'
-import { io } from "socket.io-client"
 import { getChannels } from "../../helpers/requests/forum"
-import { initSocket } from "../../helpers/requests/sockets"
 import { useAuth } from "../../helpers/context/User"
 
 export const Forum: NextPage = () => {
     const [searchValue, setSearchValue] = React.useState('');
     const searchRegex = new RegExp(searchValue, 'i');
     const [channels, setChannels] = React.useState<IChannel[]>([])
-    const { token } = useAuth()
+    const { token, socket } = useAuth()
 
     React.useEffect(() => {
         getChannels().then(res => res.json().then(channel => setChannels(channel)))
-        const socket = initSocket(token || null)
+    }, []);
 
-        socket.on('channels', (method, channel) => {
+    React.useEffect(() => {
+        if(!socket) return;
+        socket.removeListener('channels');
+        socket.on('channels', (method: string, channel: any) => {
             if (method === 'POST') {
                 setChannels(prev => [...prev, channel])
             }
@@ -29,7 +30,7 @@ export const Forum: NextPage = () => {
                 setChannels(prev => prev.map(c => c.id === channel.id ? channel : c))
             }
         });
-    }, []);
+    }, [socket])
 
     return (
         <div className="w-full h-full py-5 flex justify-start items-center relative">

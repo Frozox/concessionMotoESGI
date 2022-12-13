@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import withMiddleware from "../../../../../lib/middlewares";
 import { PrismaClientSingleton } from "../../../../../lib/prismaUtils";
-import { NextApiUserRequest } from "../../../../../lib/types";
+import {
+  NextApiResponseServerIO,
+  NextApiUserRequest,
+} from "../../../../../lib/types";
 
 const prisma = PrismaClientSingleton.getInstance().prisma;
 
@@ -25,7 +28,10 @@ const getDirectMessages = withMiddleware("withAuth")(
       return res.status(401).json({ message: "Unauthorized" });
     }
     try {
-      const { take, beforeCreatedAt } = req.query as { take?: string; beforeCreatedAt?: string }
+      const { take, beforeCreatedAt } = req.query as {
+        take?: string;
+        beforeCreatedAt?: string;
+      };
 
       const directMessages = await prisma.directMessage.findMany({
         where: {
@@ -43,10 +49,26 @@ const getDirectMessages = withMiddleware("withAuth")(
             lt: beforeCreatedAt ? new Date(beforeCreatedAt) : undefined,
           },
         },
+        include: {
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+          receiver: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
         orderBy: {
           createdAt: "desc",
         },
-        take: take ? Math.min(Math.max(Number(take), 0), 10) : 5,
+        take: take ? Math.min(Math.max(Number(take), 0), 10) : 10,
       });
       res.status(200).json(directMessages);
     } catch (error) {
@@ -56,7 +78,7 @@ const getDirectMessages = withMiddleware("withAuth")(
 );
 
 const sendDirectMessage = withMiddleware("withAuth")(
-  async (req: NextApiUserRequest, res: NextApiResponse) => {
+  async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
     if (req.user.id === String(req.query.userId)) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -71,7 +93,26 @@ const sendDirectMessage = withMiddleware("withAuth")(
           receiverId: String(req.query.userId),
           content,
         },
+        include: {
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+          receiver: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
       });
+
+      res.socket.server.io.to('directMessage_' + req.user.id).emit("directMessage", "POST", directMessage);
+      res.socket.server.io.to('directMessage_' + String(req.query.userId)).emit("directMessage", "POST", directMessage);
 
       res.status(200).json(directMessage);
     } catch (error) {

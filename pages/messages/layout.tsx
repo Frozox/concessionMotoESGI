@@ -4,22 +4,20 @@ import { useEffect, useState } from "react";
 import { getContacts, sendContactMessage } from "../../helpers/requests/contact";
 import { useAuth } from "../../helpers/context/User";
 import { getUsers } from "../../helpers/requests/user";
+import { ChatInput } from "../../components/ChatInput";
 
 const LayoutMessages = ({ children, userIdSelected }: { children: JSX.Element, userIdSelected: string | null }) => {
     const [searchValue, setSearchValue] = useState('');
     const searchRegex = new RegExp(searchValue, 'i');
     const [contacts, setContacts] = useState<User[]>([])
     const [users, setUsers] = useState<User[]>([])
+    const [chatInputValue, setChatInputValue] = useState<string>('');
     const { token, user } = useAuth()
 
-    const sendMessage = (event: any) => {
-        if (event.key === 'Enter' && event.target.value.length > 0 && token && userIdSelected) {
-            sendContactMessage(token, userIdSelected, event.target.value).then(res => res.json().then(data => {
-                if (res.ok) {
-                    console.log(data)
-                }
-            }))
-            event.target.value = ''
+    const sendMessage = () => {
+        if (token && userIdSelected) {
+            sendContactMessage(token, userIdSelected, chatInputValue);
+            setChatInputValue('');
         }
     }
 
@@ -69,7 +67,21 @@ const LayoutMessages = ({ children, userIdSelected }: { children: JSX.Element, u
                         {children}
                         {
                             userIdSelected && (
-                                <input type="text" className="w-full p-3 bg-transparent border rounded-md focus:outline-none text-white" placeholder="Contenu du message" onKeyDown={sendMessage} />
+                                <ChatInput
+                                    placeholder="Contenu du message"
+                                    btnName="Envoyer"
+                                    value={chatInputValue}
+                                    onChange={(e) => setChatInputValue(e.target.value)}
+                                    onSubmit={sendMessage}
+                                    theme="dark"
+                                    onKeyPress={
+                                        (e) => {
+                                            if (e.key === 'Enter' && chatInputValue.length > 0) {
+                                                sendMessage()
+                                            }
+                                        }
+                                    }
+                                />
                             )
                         }
                     </div>

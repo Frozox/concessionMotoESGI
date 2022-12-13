@@ -28,6 +28,7 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
         for (const channel of socket.data.user.memberOnChannels) {
           socket.join("channel_" + channel.id);
         }
+        socket.join("directMessage_" + socket.data.user.id);
       }
     });
 
