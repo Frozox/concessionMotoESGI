@@ -6,23 +6,24 @@ interface ChatInputProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void
     onSubmit: () => void
+    theme: "light" | "dark"
     btnName: string
     icon?: JSX.Element
 }
 
-export const ChatInput = ({ placeholder, value, onChange, onKeyPress, onSubmit, btnName, icon }: ChatInputProps) => {
+export const ChatInput = ({ placeholder, value, onChange, onKeyPress, onSubmit, theme = "light", btnName, icon }: ChatInputProps) => {
     return (
         <div className="flex items-center space-x-2 m-2">
             <input
                 type="text"
-                className="w-full p-3 bg-transparent border rounded-md focus:outline-none"
+                className={`w-full p-3 bg-transparent border rounded-md focus:outline-none ${theme === "light" ? "text-black" : "text-white"}`}
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
                 onKeyDown={onKeyPress}
             />
             <div
-                className="p-3 bg-transparent border rounded-md focus:outline-none hover:bg-blue-500 hover:text-white items-center flex space-x-2 cursor-pointer"
+                className={`p-3 bg-transparent border rounded-md focus:outline-none hover:bg-blue-500 hover:text-white items-center flex space-x-2 cursor-pointer ${theme === "light" ? "text-black" : "text-white"}`}
                 onClick={onSubmit}
             >
                 <span>{btnName}</span>
