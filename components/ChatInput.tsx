@@ -1,9 +1,10 @@
+import { ChangeEventHandler } from "react"
 import { BiPaperPlane } from "react-icons/bi"
 
 interface ChatInputProps {
     placeholder?: string
     value: string
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onChange: ChangeEventHandler<HTMLInputElement>
     onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void
     onSubmit: () => void
     theme: "light" | "dark"
@@ -13,7 +14,7 @@ interface ChatInputProps {
     id?: string
 }
 
-export const ChatInput = ({ placeholder, value, onChange, onKeyPress, onSubmit, theme = "light", btnName, icon, fullWith }: ChatInputProps) => {
+export const ChatInput = ({ placeholder, value, onChange, onKeyPress, onSubmit, theme = "light", btnName, icon, fullWith, id }: ChatInputProps) => {
     return (
         <div className={`flex items-center space-x-2 m-2 ${fullWith ? 'w-full' : ''}`}>
             <input

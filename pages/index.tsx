@@ -6,8 +6,8 @@ import Artcle2 from '../public/article2.jpeg'
 import { Article } from '../components/Article'
 import { FiArrowDownCircle } from 'react-icons/fi'
 import Link from 'next/link'
-import React from 'react'
-import { ChatBot } from '../components/ChatBot'
+import React, { lazy } from 'react'
+import { ChatBot } from '../components/Chatbot/ChatBot'
 
 const Home: NextPage = () => {
     const articles = [
@@ -27,16 +27,23 @@ const Home: NextPage = () => {
                     className="flex items-center justify-center h-[80vh] mb-12 bg-fixed bg-center bg-cover bg-[url('/bg-homepage.jpeg')]"
                 />
                 <div className='fixed bg-white right-8 bottom-8'>
-                    <div className={`${isShowing ? 'bg-white text-black' : 'hidden'} rounded-xl absolute right-20 bottom-20 w-[70vh] h-[50vh] overflow-scroll`}>
+                    <div className={`${isShowing ? 'bg-white text-black' : 'hidden'} rounded-xl absolute right-20 bottom-20 w-[70vh] h-[75vh] overflow-scroll`}>
                         <ChatBot steps={[
                             { id: 1, message: 'Bonjour, je suis Amin, votre assistant virtuel', sendAt: new Date() },
-                            { id: 2, message: 'Que puis-je faire pour vous ?', sendAt: new Date() },
+                            {
+                                id: 2, message: 'Que puis-je faire pour vous ?', sendAt: new Date(), options: [
+                                    { id: 1, value: 'Je veux voir les offres', label: 'Je veux voir les offres' },
+                                    { id: 2, value: 'Je veux voir les concessionnaires', label: 'Je veux voir les concessionnaires' },
+                                    { id: 3, value: 'Je veux voir les nouveautés', label: 'Je veux voir les nouveautés' },
+                                    { id: 4, value: 'Je veux voir les services', label: 'Je veux voir les services' },
+                                ]
+                            },
                         ]}
                             botName='Amin assistant virtuel'
                             isOpen={isShowing}
                         />
                     </div>
-                    <div className="h-20 w-20 rounded-full bg-[url('/amin_bot.png')] bg-cover bg-center absolute right-2 bottom-2 bg-white shadow-lg cursor-pointer"
+                    <div className="h-20 w-20 rounded-full bg-[url('/amin_bg.png')] bg-cover bg-center absolute right-2 bottom-2 bg-white shadow-lg cursor-pointer"
                         onClick={() => setIsShowing(!isShowing)}
                     />
                 </div>

@@ -1,72 +1,10 @@
-import React, { Fragment, Suspense } from "react"
+import React, { Fragment } from "react"
 import { motion } from "framer-motion"
-import { ChatInput } from "./ChatInput"
-import AminBot from '../public/amin_bot.png'
+import { ChatInput } from "../ChatInput"
+import AminBot from '../../public/amin_bg.png'
 import Image from "next/image"
-
-export interface Steps {
-    id: number
-    message: string
-    options?: {
-        value: string
-        label: string
-        trigger: string
-    }[]
-    sendAt: Date
-}
-
-interface UserMessages {
-    anwserStep: number
-    message: string
-    sendAt: Date
-}
-
-interface ChatBotProps {
-    steps: Steps[]
-    botName?: string
-    isOpen: boolean
-}
-
-interface MessageProps {
-    user: UserMessages[],
-    bot: Steps[],
-}
-
-export const IsTypingBuble = ({ isBot }: { isBot: boolean }) => {
-    return (
-        <motion.div
-            className={`flex items-center  ${isBot ? 'justify-start ml-4' : 'justify-end mr-4'}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-        >
-            <div className="flex space-x-2 p-3 bg-slate-300 rounded-full">
-                <div className="w-3 h-3 bg-gray-400 rounded-full animate-pulse" />
-                <div className="w-3 h-3 bg-gray-400 rounded-full animate-pulse" />
-                <div className="w-3 h-3 bg-gray-400 rounded-full animate-pulse" />
-            </div>
-        </motion.div>
-    )
-}
-
-export const ChatMessage = ({ message, isBot }: { message: UserMessages | Steps, isBot: boolean }) => {
-    return (
-        <motion.div
-            className={`flex flex-col ${isBot ? 'justify-start items-start ml-4' : 'justify-end items-end mr-4'}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-        >
-            <div className={`flex space-x-2 p-3 bg-slate-300 rounded-full ${isBot ? 'bg-blue-300' : 'bg-gray-300'}`}>
-                <p className="text-sm">{isBot ? (message as Steps)?.message : (message as UserMessages)?.message}</p>
-            </div>
-            <div className={`flex space-x-2 ${isBot ? 'ml-2' : 'mr-2'} mt-2`}>
-                <p className="text-xs text-gray-500">{isBot ? 'Amin assitant virtuelle' : 'Vous'}</p>
-                <p className="text-xs text-gray-500">{message?.sendAt.toLocaleTimeString()}</p>
-            </div>
-        </motion.div>
-    )
-}
+import { Steps, ChatBotProps, MessageProps } from "."
+import { ChatMessage, ChatMessageOptions, IsTypingBuble } from "./ChatMessage"
 
 export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
     const [userIsTyping, setUserIsTyping] = React.useState<boolean>(false)
@@ -80,7 +18,6 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
     }
 
     const handleUserSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
         setMessageToDisplay([...messageToDisplay, { user: [{ anwserStep: currentStep, message: userInput, sendAt: new Date() }], bot: [] }])
         setUserInput('')
         setUserIsTyping(false)
@@ -126,6 +63,11 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
         setMessageToDisplay([{ user: [], bot: [] }])
     }, [])
 
+    const hadnleOptionClick = (e: React.FormEvent<HTMLFormElement>) => {
+        setUserIsTyping(false)
+        handleUserSubmit(e)
+    }
+
     return (
         <div className="text-gray-700 h-full rounded-lg bg-blue-50">
             <div className="flex flex-col space-y-2 border h-5/6 overflow-y-scroll px-3">
@@ -149,9 +91,26 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
                                 })}
                                 {message.bot.map((botMessage, index) => {
                                     return (
-                                        <ChatMessage key={index} message={botMessage} isBot />
+                                        <Fragment>
+                                            <ChatMessage key={index} message={botMessage} isBot />
+                                            {botMessage?.options && (
+                                                <div className="grid grid-cols-2 grid-rows-2 gap-2 w-full">
+                                                    {botMessage.options.map((option, index) => {
+                                                        return (
+                                                            <ChatMessageOptions
+                                                                key={index}
+                                                                options={option}
+                                                                action={(e: React.FormEvent<HTMLFormElement>) => hadnleOptionClick(e)}
+                                                                setteur={setUserInput}
+                                                            />
+                                                        )
+                                                    })}
+                                                </div>
+                                            )}
+                                        </Fragment>
                                     )
-                                })}
+                                })
+                                }
                             </React.Fragment>
                         )
                     })}
@@ -172,6 +131,10 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
                     fullWith
                     onKeyPress={(e) => handleUserKeyPress(e)}
                     id="chat-input"
+                    onSubmit={function (): void {
+                        throw new Error("Function not implemented.")
+                    }}
+                    theme={"light"}
                 />
             </div>
         </div>
