@@ -88,3 +88,34 @@ model Faq {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
+
+model BotStep {
+  id              String           @id @default(uuid())
+  question        String
+  answers         BotAnswer[]
+  isRoot          Boolean          @default(false)
+  nextStepAnswers BotAnswer[]      @relation("NextBotStep")
+  BotUserMessages BotUserMessage[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
+}
+
+model BotAnswer {
+  id         String   @id @default(uuid())
+  answer     String
+  step       BotStep  @relation(fields: [stepId], references: [id])
+  stepId     String
+  nextStep   BotStep? @relation(name: "NextBotStep", fields: [nextStepId], references: [id], onDelete: Cascade)
+  nextStepId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+}
+
+model BotUserMessage {
+  id        String   @id @default(uuid())
+  step      BotStep  @relation(fields: [stepId], references: [id])
+  stepId    String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
