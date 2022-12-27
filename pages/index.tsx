@@ -28,17 +28,6 @@ const Home: NextPage = () => {
                 />
                 <div className='fixed bg-white right-8 bottom-8'>
                     <div className={`${isShowing ? 'bg-white text-black' : 'hidden'} rounded-xl absolute right-20 bottom-20 w-[70vh] h-[75vh] overflow-scroll`}>
-                        {/* <ChatBot steps={[
-                            { id: 1, message: 'Bonjour, je suis Amin, votre assistant virtuel', sendAt: new Date() },
-                            {
-                                id: 2, message: 'Que puis-je faire pour vous ?', sendAt: new Date(), options: [
-                                    { id: 1, value: 'Je veux voir les offres', label: 'Je veux voir les offres' },
-                                    { id: 2, value: 'Je veux voir les concessionnaires', label: 'Je veux voir les concessionnaires' },
-                                    { id: 3, value: 'Je veux voir les nouveautés', label: 'Je veux voir les nouveautés' },
-                                    { id: 4, value: 'Je veux voir les services', label: 'Je veux voir les services' },
-                                ]
-                            },
-                        ]} */}
                         <ChatBot
                             botName='Amin assistant virtuel'
                             isOpen={isShowing}

@@ -1,36 +1,30 @@
+import { BotAnswer, BotStep, BotUserMessage } from "@prisma/client"
 import React from "react"
-
-export interface Steps {
-    id: number
-    message: string
-    options?: Options[]
-    sendAt: Date
-}
-
-export interface Options {
-    value: string
-    label: string
-    id: number
-}
-
-export interface UserMessages {
-    anwserStep: number
-    message: string
-    sendAt: Date
-}
 
 export interface ChatBotProps {
     botName?: string
     isOpen: boolean
 }
 
-export interface MessageProps {
-    user: UserMessages[],
-    bot: Steps[],
+export interface AnswerProps extends BotAnswer {
+    nextStep: BotStep
 }
 
-export interface OptionsProps {
-    options: Options
-    action: (e: any) => void
-    setteur: React.Dispatch<React.SetStateAction<string>>
+export interface StepProps extends BotStep {
+    answers: BotAnswer[]
+}
+
+export interface UserMessageProps extends BotUserMessage {
+    step: BotStep
+}
+
+export interface MessageHistory {
+    bot: StepProps[]
+    user: UserMessageProps[]
+}
+
+export interface ChatMessageOptionsProps {
+    answer: BotAnswer, 
+    setter: React.Dispatch<React.SetStateAction<StepProps | undefined>>,
+    setUserMessages: React.Dispatch<React.SetStateAction<UserMessageProps | undefined>>
 }

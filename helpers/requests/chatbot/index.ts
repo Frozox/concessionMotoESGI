@@ -1,16 +1,29 @@
 import { apiRequest } from "..";
 
-export const getWorkflows = async () => {
+export const getSteps = async () => {
     return await apiRequest({
         method: "GET",
-        url: "/workflow",
+        url: "/chatbot/steps",
     });
 }
 
-export const postUserChoice = async (workflowId: string) => {
+export const getAnswers = async () => {
     return await apiRequest({
-        method: "POST",
-        url: `/workflow/${workflowId}`,
+        method: "GET",
+        url: `/chatbot/answers`,
     });
 }
 
+export const getStepById = async (stepId: string) => {
+    return await apiRequest({
+        method: "GET",
+        url: `/chatbot/steps/${stepId}`,
+    });
+}
+
+export const getAnswerById = async (answerId: string) => {
+    return await apiRequest({
+        method: "GET",
+        url: `/chatbot/answers/${answerId}`,
+    });
+}
