@@ -20,7 +20,6 @@ export interface UserMessages {
 }
 
 export interface ChatBotProps {
-    steps: Steps[]
     botName?: string
     isOpen: boolean
 }

@@ -3,22 +3,39 @@ import { motion } from "framer-motion"
 import { ChatInput } from "../ChatInput"
 import AminBot from '../../public/amin_bg.png'
 import Image from "next/image"
-import { Steps, ChatBotProps, MessageProps } from "."
+import { Steps, ChatBotProps, MessageProps, Options } from "."
 import { ChatMessage, ChatMessageOptions, IsTypingBuble } from "./ChatMessage"
+import { getWorkflows } from "../../helpers/requests/chatbot"
 
-export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
+export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
     const [userIsTyping, setUserIsTyping] = React.useState<boolean>(false)
     const [userInput, setUserInput] = React.useState<string>('')
     const [botIsTyping, setBotIsTyping] = React.useState<boolean>(false)
     const [currentStep, setCurrentStep] = React.useState<number>(0)
     const [messageToDisplay, setMessageToDisplay] = React.useState<MessageProps[]>([{ user: [], bot: [] }])
 
+    const getInitWorkflow = React.useCallback(async () => {
+        console.log(currentStep);
+        if (currentStep === 0) {
+            const response = await getWorkflows().then(res => res.json()).then(data => data)
+            return response
+        }
+    }, [currentStep])
+
+    const initWorkflow = getInitWorkflow()
+
+    console.log(initWorkflow)
+
     const handleUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUserInput(e.target.value)
     }
 
-    const handleUserSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        setMessageToDisplay([...messageToDisplay, { user: [{ anwserStep: currentStep, message: userInput, sendAt: new Date() }], bot: [] }])
+    const handleUserSubmit = (e: React.FormEvent<HTMLFormElement>, optionSelected?: Options) => {
+        if (optionSelected) {
+            setMessageToDisplay([...messageToDisplay, { user: [{ anwserStep: currentStep, message: optionSelected.label, sendAt: new Date() }], bot: [] }])
+        } else {
+            setMessageToDisplay([...messageToDisplay, { user: [{ anwserStep: currentStep, message: userInput, sendAt: new Date() }], bot: [] }])
+        }
         setUserInput('')
         setUserIsTyping(false)
     }
@@ -28,10 +45,15 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
         setTimeout(() => {
             setBotIsTyping(false)
             if (!messageToDisplay.find(message => message.bot.find(botMessage => botMessage?.id === currentStep))) {
-                setMessageToDisplay([...messageToDisplay, { user: [], bot: [steps.find(step => step.id === currentStep) as Steps] }])
+                setMessageToDisplay([...messageToDisplay, {
+                    user: [],
+                    bot: [
+                        { id: currentStep, message: 'Bonjour, je suis Amin, votre assistant personnel. Comment puis-je vous aider ?', sendAt: new Date(), options: [{ id: 1, label: 'Je veux un devis', value: 'devis' }, { id: 2, label: 'Je veux un RDV', value: 'rdv' }] }
+                    ]
+                }])
             }
         }, 1000)
-    }, [currentStep, steps])
+    }, [currentStep])
 
     const handleNextStep = React.useCallback((step: number) => {
         setCurrentStep(step + 1)
@@ -50,7 +72,9 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
     React.useEffect(() => { //executed when user open chatbot(1)
         if (isOpen) {
             if (currentStep === 0) {
-                setCurrentStep(steps[0].id) // set step at 1
+                setCurrentStep(
+                    messageToDisplay.find(message => message.bot.find(botMessage => botMessage?.id === currentStep)) ? currentStep + 1 : currentStep
+                ) // set step at 1
                 handleBotSubmit()
             } else {
                 handleBotSubmit()
@@ -63,9 +87,9 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
         setMessageToDisplay([{ user: [], bot: [] }])
     }, [])
 
-    const hadnleOptionClick = (e: React.FormEvent<HTMLFormElement>) => {
+    const hadnleOptionClick = (e: React.FormEvent<HTMLFormElement>, optionSelected: Options) => {
         setUserIsTyping(false)
-        handleUserSubmit(e)
+        handleUserSubmit(e, optionSelected)
     }
 
     return (
@@ -83,7 +107,7 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
                 <div className="flex flex-col space-y-2">
                     {messageToDisplay.map((message, index) => {
                         return (
-                            <React.Fragment key={index}>
+                            <Fragment key={index}>
                                 {message.user.map((userMessage, index) => {
                                     return (
                                         <ChatMessage key={index} message={userMessage} isBot={false} />
@@ -91,7 +115,7 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
                                 })}
                                 {message.bot.map((botMessage, index) => {
                                     return (
-                                        <Fragment>
+                                        <Fragment key={index}>
                                             <ChatMessage key={index} message={botMessage} isBot />
                                             {botMessage?.options && (
                                                 <div className="grid grid-cols-2 grid-rows-2 gap-2 w-full">
@@ -100,7 +124,7 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
                                                             <ChatMessageOptions
                                                                 key={index}
                                                                 options={option}
-                                                                action={(e: React.FormEvent<HTMLFormElement>) => hadnleOptionClick(e)}
+                                                                action={(e: React.FormEvent<HTMLFormElement>) => hadnleOptionClick(e, option)}
                                                                 setteur={setUserInput}
                                                             />
                                                         )
@@ -111,7 +135,7 @@ export const ChatBot = ({ steps, botName, isOpen }: ChatBotProps) => {
                                     )
                                 })
                                 }
-                            </React.Fragment>
+                            </Fragment>
                         )
                     })}
                 </div>
