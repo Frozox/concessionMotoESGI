@@ -1,9 +1,7 @@
 import React, { Fragment } from "react"
-import { motion } from "framer-motion"
-import { ChatInput } from "../ChatInput"
 import AminBot from '../../public/amin_bg.png'
 import Image from "next/image"
-import { StepProps, ChatBotProps, UserMessageProps, AnswerProps, MessageHistory } from "."
+import { StepProps, ChatBotProps, UserMessageProps, MessageHistory } from "."
 import { ChatMessage, ChatMessageOptions, IsTypingBuble } from "./ChatMessage"
 import { getSteps } from "../../helpers/requests/chatbot"
 import { BotAnswer } from "@prisma/client"
@@ -19,14 +17,32 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
         setBotIsTyping(true)
         setTimeout(() => {
             setBotIsTyping(false)
+            setMessageToDisplay([...messageToDisplay, { user: [], bot: [currentStep as StepProps] }])
         }, 1000)
-    }
-        , [currentStep])
+    }, [currentStep])
+
+    const handleUserSubmit = React.useCallback(() => {
+        if (userMessages) {
+            setMessageToDisplay([...messageToDisplay, { user: [{ message: userMessages, sentAt: new Date() }], bot: [] }])
+            setUserMessages('')
+        }
+    }, [userMessages])
+
+    const handleCloseChat = React.useCallback(() => {
+        setCurrentStep(undefined)
+        setUserMessages('')
+        setStepsList([])
+        setMessageToDisplay([{ user: [], bot: [] }])
+    }, [])
+
 
     React.useEffect(() => {
         if (isOpen) {
-            if (!currentStep) {
-                return setCurrentStep(stepsList.find(step => step.isRoot))
+            if (stepsList.length === 0) {
+                getSteps().then(res => res.json()).then(data => setStepsList(data))
+            }
+            if (!currentStep && stepsList.length > 0) {
+                stepsList.find(step => step.isRoot)?.isRoot && setCurrentStep(stepsList.find(step => step.isRoot))
             }
             if (currentStep?.isRoot) {
                 setBotIsTyping(true)
@@ -36,20 +52,16 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
                 }, 1000)
             }
         }
-    }, [isOpen, currentStep])
+    }, [isOpen, currentStep, stepsList.length])
 
     React.useEffect(() => {
-        if (stepsList.length === 0) {
-            getSteps().then(res => res.json()).then(data => setStepsList(data))
+        if (currentStep && !currentStep.isRoot) {
+            handleBotSubmit()
         }
-    }, [stepsList.length])
-
-    const handleCloseChat = React.useCallback(() => {
-        setCurrentStep(undefined)
-        setUserMessages('')
-        setStepsList([])
-        setMessageToDisplay([{ user: [], bot: [] }])
-    }, [])
+        if (userMessages) {
+            handleUserSubmit()
+        }
+    }, [currentStep, userMessages])
 
     return (
         <div className="text-gray-700 h-full rounded-lg bg-blue-50">
@@ -75,7 +87,7 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
                                                 isBot
                                             />
                                             <div className="grid grid-cols-2 grid-rows-2 gap-2 w-full">
-                                                {botMessage.answers.map((answer: BotAnswer, index: number) => {
+                                                {botMessage?.answers.map((answer: BotAnswer, index: number) => {
                                                     return (
                                                         <ChatMessageOptions
                                                             answer={answer}
@@ -89,7 +101,7 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
                                         </Fragment>
                                     )
                                 })}
-                                {message.user.map((userMessage: UserMessageProps, index: number) => {
+                                {message.user.map((userMessage: any, index: number) => {
                                     return (
                                         <ChatMessage
                                             message={userMessage}

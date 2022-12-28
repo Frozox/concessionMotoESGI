@@ -40,10 +40,10 @@ export const ChatMessage = ({ message, isBot }: { message: UserMessageProps | St
 }
 
 export const ChatMessageOptions = ({ answer, setter, setUserMessages }: ChatMessageOptionsProps) => {
-    const handleClick = (nextStepId: string | null) => {
-        if (nextStepId) {
-            getStepById(nextStepId).then(res => res.json()).then(data => { setter(data) })
-            setUserMessages()
+    const handleClick = (nextStep: BotAnswer | null) => {
+        if (nextStep) {
+            setUserMessages(nextStep.answer)
+            getStepById(nextStep.nextStepId as string).then(res => res.json()).then(data => { setter(data) })
         }
     }
 
@@ -53,7 +53,7 @@ export const ChatMessageOptions = ({ answer, setter, setUserMessages }: ChatMess
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            onClick={() => handleClick(answer.nextStepId)}
+            onClick={() => handleClick(answer)}
         >
             {answer.answer}
         </motion.div>

@@ -20,11 +20,11 @@ export interface UserMessageProps extends BotUserMessage {
 
 export interface MessageHistory {
     bot: StepProps[]
-    user: UserMessageProps[]
+    user: { message: string, sentAt: Date }[]
 }
 
 export interface ChatMessageOptionsProps {
-    answer: BotAnswer, 
+    answer: BotAnswer,
     setter: React.Dispatch<React.SetStateAction<StepProps | undefined>>,
-    setUserMessages: React.Dispatch<React.SetStateAction<UserMessageProps | undefined>>
+    setUserMessages: React.Dispatch<React.SetStateAction<string>>
 }

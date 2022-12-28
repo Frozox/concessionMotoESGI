@@ -19,7 +19,7 @@ export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     const { toggle, isShowing } = useModal()
     const { isAdmin } = useAuth()
 
-    React.useCallback(() => {
+    React.useEffect(() => {
         if (!isAdmin) {
             router.push('/')
         }
