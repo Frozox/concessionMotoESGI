@@ -39,23 +39,25 @@ export const ChatMessage = ({ message, isBot }: { message: UserMessageProps | St
     )
 }
 
-export const ChatMessageOptions = ({ answer, setter, setUserMessages }: ChatMessageOptionsProps) => {
+export const ChatMessageOptions = ({ answer, setter, setUserMessages, disabled }: ChatMessageOptionsProps) => {
     const handleClick = (nextStep: BotAnswer | null) => {
-        if (nextStep) {
+        if (nextStep?.nextStepId) {
             setUserMessages(nextStep.answer)
             getStepById(nextStep.nextStepId as string).then(res => res.json()).then(data => { setter(data) })
         }
     }
 
     return (
-        <motion.div
-            className="flex w-min-[3rem] border rounded-md shadow-sm px-4 py-2 cursor-pointer hover:bg-gray-200"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            onClick={() => handleClick(answer)}
-        >
-            {answer.answer}
-        </motion.div>
+        disabled ? null :
+            <motion.div
+                className="flex w-min-[3rem] border rounded-md shadow-sm px-4 py-2 cursor-pointer hover:bg-gray-200"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                onClick={() => handleClick(answer)}
+            >
+                {answer.answer}
+            </motion.div>
+
     )
 }

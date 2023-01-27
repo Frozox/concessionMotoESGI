@@ -9,6 +9,7 @@ export const useAlert = () => {
 
     return {
         toggleAlert,
-        showAlert
+        showAlert,
+        setShowAlert
     };
 }

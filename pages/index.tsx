@@ -26,7 +26,7 @@ const Home: NextPage = () => {
                 <header
                     className="flex items-center justify-center h-[80vh] mb-12 bg-fixed bg-center bg-cover bg-[url('/bg-homepage.jpeg')]"
                 />
-                <div className='fixed bg-white right-8 bottom-8'>
+                <div className='fixed bg-white right-8 bottom-8 z-40'>
                     <div className={`${isShowing ? 'bg-white text-black' : 'hidden'} rounded-xl absolute right-20 bottom-20 w-[70vh] h-[75vh] overflow-scroll`}>
                         <ChatBot
                             botName='Amin assistant virtuel'
