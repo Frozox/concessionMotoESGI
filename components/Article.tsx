@@ -16,6 +16,7 @@ export const Article = ({ img, title, description, link }: IArticle) => {
                     src={img}
                     alt="article1"
                     width={400}
+                    loading='lazy'
                 />
             </figure>
             <div className="card-body">

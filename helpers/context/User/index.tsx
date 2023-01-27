@@ -17,6 +17,7 @@ export type AuthContextType = {
     setToken: React.Dispatch<React.SetStateAction<string | null>>;
     setUser: React.Dispatch<React.SetStateAction<UserJWT | null>>;
     closeSession: () => void;
+    isConnected: boolean;
 };
 
 
@@ -28,14 +29,16 @@ const AuthContext = React.createContext<AuthContextType>({
     setToken: () => null,
     setUser: () => null,
     closeSession: () => null,
+    isConnected: false,
 })
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [token, setToken] = React.useState<string | null>(null)
     const [user, setUser] = React.useState<UserJWT | null>(null)
-    const valueToWatch = typeof window !== 'undefined' && localStorage.getItem('token')
-    const isAdmin = user?.roles?.map((role) => role.name).includes('ADMIN') || false
     const [socket, setSocket] = React.useState<AuthSocket<Socket> | null>(null);
+    const valueToWatch = typeof window !== 'undefined' && localStorage.getItem('token')
+    const isAdmin = React.useMemo(() => user?.roles?.map((role) => role.name).includes('ADMIN') || false, [user])
+    const isConnected = React.useMemo(() => token !== null, [token])
 
     const closeSession = useCallback(() => {
         setToken(null)
@@ -56,10 +59,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [valueToWatch, typeof window, token])
 
     React.useEffect(() => {
-        if(!socket) {
+        if (!socket) {
             return setSocket(initSocket(token))
         }
-        if(token && socket.auth.token === null || !token && socket.auth.token !== null) {
+        if (token && socket.auth.token === null || !token && socket.auth.token !== null) {
             socket.disconnect();
             setSocket(initSocket(token));
         }
@@ -73,7 +76,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setToken,
         setUser,
         closeSession,
-    }), [user, token, isAdmin, socket, setToken, setUser, closeSession])
+        isConnected
+    }), [user, token, isAdmin, socket, setToken, setUser, closeSession, isConnected])
 
     return (
         <AuthContext.Provider value={value}>

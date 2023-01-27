@@ -25,7 +25,7 @@ export const Avatar = ({ indicator, userLetters }: IAvatar) => {
                 <div className="grid grid-cols-1 overflow-scroll p-2 w-52 h-32 gap-1">
                     <Link
                         href="/messages"
-                        className="input-user-navbar"
+                        className="input-user-navbar hover:bg-blue-500 hover:text-white"
                     >
                         {/* ou mettre l'indicator si notif */}
                         <HiOutlineMail className="mr-2" />
