@@ -12,6 +12,7 @@ export type IChannel = Channel & {
         members: number
     }
     members: User[]
+    oc: () => void
 }
 
 export const ChannelComponent = (channel: IChannel) => {
@@ -23,7 +24,7 @@ export const ChannelComponent = (channel: IChannel) => {
             key={channel.id}
             className="w-full h-32 bg-[#ffffff25] border border-gray-300 rounded-md cursor-pointer hover:bg-white/90 text-white p-3 hover:text-gray-800 group items-center flex"
         >
-            <div className="flex justify-start items-start w-full h-full" onClick={() => router.push(`/forum/${channel.id}`)}>
+            <div className="flex justify-start items-start w-full h-full" onClick={() => channel.oc()}>
                 <div className='flex justify-start flex-col'>
                     <div className="text-lg font-bold items-center min-w-[35rem]">{channel.title}</div>
                     <div className="text-sm italic text-gray-300 group-hover:text-gray-600">{new Date(channel.createdAt).toLocaleDateString('fr-FR', { dateStyle: 'full' })}</div>
@@ -58,10 +59,12 @@ export const ChannelComponent = (channel: IChannel) => {
                                 Quitter
                             </div>
                         ) : (
-                            <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-green-500 hover:text-white`} onClick={() => handleJoinChannel(channel.id, token)}>
-                                <BsDoorOpen className="" />
-                                <span>Rejoindre</span>
-                            </div>
+                            channel._count.members < channel.capacity && (
+                                <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-green-500 hover:text-white`} onClick={() => handleJoinChannel(channel.id, token)}>
+                                    <BsDoorOpen className="" />
+                                    <span>Rejoindre</span>
+                                </div>
+                            )
                         )
                         : (
                             <div className={`p-3 rounded-lg bg-slate-300 min-w-[120px] text-black flex justify-center items-center space-x-1 hover:bg-red-500 hover:text-white cursor-not-allowed`}>
