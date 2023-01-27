@@ -26,5 +26,6 @@ export interface MessageHistory {
 export interface ChatMessageOptionsProps {
     answer: BotAnswer,
     setter: React.Dispatch<React.SetStateAction<StepProps | undefined>>,
-    setUserMessages: React.Dispatch<React.SetStateAction<string>>
+    setUserMessages: React.Dispatch<React.SetStateAction<string>>,
+    disabled: boolean
 }

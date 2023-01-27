@@ -12,6 +12,7 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
     const [stepsList, setStepsList] = React.useState<StepProps[]>([])
     const [userMessages, setUserMessages] = React.useState<string>('')
     const [messageToDisplay, setMessageToDisplay] = React.useState<MessageHistory[]>([{ user: [], bot: [] }])
+    let answer: any
 
     const handleBotSubmit = React.useCallback(() => {
         setBotIsTyping(true)
@@ -64,7 +65,7 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
     }, [currentStep, userMessages])
 
     return (
-        <div className="text-gray-700 h-full rounded-lg bg-blue-50">
+        <div className="text-gray-700 h-full rounded-lg bg-blue-50 z-40">
             <div className="flex flex-col space-y-2 h-full overflow-hidden px-3">
                 <div className="flex justify-between">
                     <div className="space-x-3 mt-3 flex items-center ">
@@ -94,6 +95,7 @@ export const ChatBot = ({ botName, isOpen }: ChatBotProps) => {
                                                             setter={setCurrentStep}
                                                             setUserMessages={setUserMessages}
                                                             key={index}
+                                                            disabled={currentStep?.id !== botMessage.id}
                                                         />
                                                     )
                                                 })}
