@@ -29,9 +29,20 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
 
     React.useEffect(() => {
         if (!socket) return;
+        // User notifications
+        socket.removeListener('notifications');
+        socket.on('notifications', (method: string, notif: any) => {
+            console.log('notifications', "IN NAVBAR");
+        });
+        // Admin notifications
         socket.removeListener('admin_notifications');
         socket.on('admin_notifications', (method: string, notif: any) => {
-            console.log(method, notif);
+            console.log('admin_notifications', "IN NAVBAR");
+        });
+        // Admin contact request
+        socket.removeListener('admin_contact_request');
+        socket.on('admin_contact_request', (method: string, status: any) => {
+            console.log('admin_contact_request', "IN NAVBAR")
         });
     }, [socket])
 

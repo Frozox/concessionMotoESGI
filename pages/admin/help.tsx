@@ -1,11 +1,114 @@
-import { Fragment } from "react"
+import { adminRequest } from "@prisma/client"
+import React from "react"
+import { useAuth } from "../../helpers/context/User"
+import { getInitial } from "../../helpers/helper"
+import { getAdminRequests, updateAdminRequestById } from "../../helpers/requests/adminRequest"
 import { LayoutAdmin } from "./layout"
 
 const AdminHelp = () => {
+    const { socket, token, user } = useAuth();
+
+    type adminRequestWithUser = adminRequest & {
+        user: {
+            firstName: string,
+            lastName: string,
+            email: string
+        }, requestApprover: {
+            firstName: string,
+            lastName: string,
+            email: string
+        }
+    }
+
+    const [adminRequests, setAdminRequests] = React.useState<adminRequestWithUser[]>([])
+
+    const statusList = [
+        { slug: "pending", status: 'En attente', color: 'bg-yellow-200 text-yellow-800' },
+        { slug: "accepted", status: 'Accepté', color: 'bg-green-200 text-green-800' },
+        { slug: "declined", status: 'Refusé', color: 'bg-red-200 text-red-800' },
+        { slug: "cancelled", status: 'Annulé', color: 'bg-gray-200 text-gray-800' },
+    ]
+
+    React.useEffect(() => {
+        if (adminRequests.length === 0 && token) {
+            getAdminRequests(token)
+                .then(res => res.json())
+                .then(adminRequest => setAdminRequests(adminRequest))
+        }
+    }, [adminRequests.length, token])
+
+    React.useEffect(() => {
+        if (!socket) return;
+        socket.removeListener('admin_notifications_in_tab');
+        socket.on('admin_notifications_in_tab', (method: string, request: adminRequestWithUser) => {
+            if (method === "POST") {
+                setAdminRequests(prev => [request, ...prev])
+            } else if (method === "PATCH") {
+                setAdminRequests(adminRequests.map(adminRequest => {
+                    if (adminRequest.id === request.id) {
+                        return request;
+                    }
+                    return adminRequest;
+                }))
+            }
+        });
+    }, [socket, adminRequests])
+
+    const handleSelect = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, requestId: string, action: string, status: string) => {
+        if (status !== 'pending') return;
+        if (!token || !user) return;
+        if (action === 'accept') {
+            updateAdminRequestById(token, requestId, { status: 'accepted', requestApproverId: user.id })
+        } else if (action === 'decline') {
+            updateAdminRequestById(token, requestId, { status: 'declined', requestApproverId: user.id })
+        }
+    }
+
     return (
         <LayoutAdmin>
             <div className="space-y-2">
-                Help
+                {adminRequests.map((request, index) => {
+                    return (
+                        <div key={index} className="bg-white rounded-md p-2">
+                            <div className="flex justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <span className="text-1xl font-semibold text-gray-600">{getInitial(request.user.firstName + ' ' + request.user.lastName)}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <div className="text-sm font-semibold">{request.user.firstName} {request.user.lastName}</div>
+                                        <div className="text-xs text-gray-500">{request.user.email}</div>
+                                        <div className="text-xs text-gray-500">{new Date(request.createdAt).toLocaleDateString()}</div>
+                                    </div>
+                                    <div className={`inline-flex items-center w-[90px] px-2 py-1 text-sm font-medium rounded justify-center ${statusList.find(status => status.slug === request.status)?.color}`}>{statusList.find(status => status.slug === request.status)?.status}</div>
+                                </div>
+                                <div className="flex justify-between items-center p-3 space-x-2 w-full">
+                                    {request.status === 'cancelled' && (
+                                        <div className="flex space-x-2">
+                                            <span className="text-xs text-gray-500 items-center justify-center flex">{"Annulé par l'utilisateur"}</span>
+                                        </div>
+                                    )}
+                                    {request.requestApprover && (
+                                        <div className="flex space-x-2">
+                                            <span className="text-xs text-gray-500 items-center justify-center flex">Conseiller associé</span>
+                                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <span className="text-1xl font-semibold text-gray-600">{getInitial(request.requestApprover.firstName + ' ' + request.requestApprover.lastName)}</span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <div className="text-sm font-semibold">{request.requestApprover.firstName} {request.requestApprover.lastName}</div>
+                                                <div className="text-xs text-gray-500">{request.requestApprover.email}</div>
+                                            </div>
+                                        </div>
+                                    ) || <div />}
+                                    <div className="flex space-x-2">
+                                        <div className={`text-white rounded-md px-2 py-1 ${request.status === 'pending' ? 'bg-green-500 hover:cursor-pointer' : 'bg-gray-500'}`} onClick={(e) => handleSelect(e, request.id, "accept", request.status)}>Accepter</div>
+                                        <div className={`text-white rounded-md px-2 py-1 ${request.status === 'pending' ? 'bg-red-500 hover:cursor-pointer' : 'bg-gray-500'}`} onClick={(e) => handleSelect(e, request.id, "decline", request.status)}>Refuser</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
             </div>
         </LayoutAdmin>
     )

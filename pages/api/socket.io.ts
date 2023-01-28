@@ -32,7 +32,13 @@ const socketHandler = async (
           socket.join("channel_" + channel.id);
         }
         socket.join("directMessage_" + socket.data.user.id);
-        if(socket.data.user.roles.some((role: { name: string; }) => role.name === "ADMIN")) {
+        socket.join("notifications_" + socket.data.user.id);
+        if (
+          socket.data.user.roles.some(
+            (role: { name: string }) => role.name === "ADMIN"
+          )
+        ) {
+          socket.join("admin_notifications_in_tab");
           socket.join("admin_notifications");
         }
       }
