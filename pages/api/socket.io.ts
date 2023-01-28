@@ -7,7 +7,10 @@ import { exclude, PrismaClientSingleton } from "../../lib/prismaUtils";
 
 const prisma = PrismaClientSingleton.getInstance().prisma;
 
-export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
+const socketHandler = async (
+  req: NextApiRequest,
+  res: NextApiResponseServerIO
+) => {
   if (res.socket.server.io) {
     console.log("Socket is already running");
   } else {
@@ -29,6 +32,15 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
           socket.join("channel_" + channel.id);
         }
         socket.join("directMessage_" + socket.data.user.id);
+        socket.join("notifications_" + socket.data.user.id);
+        if (
+          socket.data.user.roles.some(
+            (role: { name: string }) => role.name === "ADMIN"
+          )
+        ) {
+          socket.join("admin_notifications_in_tab");
+          socket.join("admin_notifications");
+        }
       }
     });
 
@@ -62,3 +74,5 @@ export default async (req: NextApiRequest, res: NextApiResponseServerIO) => {
   }
   res.end();
 };
+
+export default socketHandler;

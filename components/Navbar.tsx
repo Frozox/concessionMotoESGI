@@ -19,12 +19,32 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
     const [show, setShow] = React.useState(false)
     const { token, isAdmin, user } = useAuth()
     const [isShowingMobile, setIsShowingMobile] = React.useState(false)
+    const { socket } = useAuth()
 
     const myLinks = [
         { href: "/forum", label: "Forum", visible: true },
         { href: "/faq", label: "FAQ", visible: true },
         { href: "/admin", label: "Administration", visible: isAdmin },
     ]
+
+    React.useEffect(() => {
+        if (!socket) return;
+        // User notifications
+        socket.removeListener('notifications');
+        socket.on('notifications', (method: string, notif: any) => {
+            console.log('notifications', "IN NAVBAR");
+        });
+        // Admin notifications
+        socket.removeListener('admin_notifications');
+        socket.on('admin_notifications', (method: string, notif: any) => {
+            console.log('admin_notifications', "IN NAVBAR");
+        });
+        // Admin contact request
+        socket.removeListener('admin_contact_request');
+        socket.on('admin_contact_request', (method: string, status: any) => {
+            console.log('admin_contact_request', "IN NAVBAR")
+        });
+    }, [socket])
 
     React.useEffect(() => {
         if (token) {
@@ -100,7 +120,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                                     </Fragment>
                                 ) : (
                                     <Avatar
-                                        indicator={2}
+                                        //indicator={2}
                                         userLetters={getInitial(user?.firstName + ' ' + user?.lastName)}
                                     />
                                 )}

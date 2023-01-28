@@ -26,6 +26,8 @@ model User {
   authorOnDirectMessages   DirectMessage[]  @relation("AuthorOnDirectMessages")
   receiverOnDirectMessages DirectMessage[]  @relation("ReceiverOnDirectMessages")
   channelMessages          ChannelMessage[]
+  adminRequests            adminRequest[]
+  approvedRequests         adminRequest[]   @relation("RequestApprover")
 }
 
 model Role {
@@ -118,4 +120,15 @@ model BotUserMessage {
   message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model adminRequest {
+  id                String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  requestApprover   User?    @relation(name: "RequestApprover", fields: [requestApproverId], references: [id])
+  requestApproverId String?
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
 }

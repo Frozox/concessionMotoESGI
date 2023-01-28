@@ -65,7 +65,7 @@ const TableList = ({ title, link }: { title: string, link: string }) => {
     const router = useRouter()
     return (
         <Link href={link}>
-            <Tab className={`px-5 py-3 ${router.pathname === link ? 'bg-white text-black' : 'bg-transparent hover:bg-[#fff]/20'} rounded-lg min-w-[7rem] text-white focus:outline-none`}>{title}</Tab>
+            <Tab className={`px-5 py-3 ${router.pathname === link ? 'bg-white text-black' : 'bg-transparent hover:bg-[#fff]/20 text-white'} rounded-lg min-w-[7rem] text-black focus:outline-none`}>{title}</Tab>
         </Link>
     )
 }
