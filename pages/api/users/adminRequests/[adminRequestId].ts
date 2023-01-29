@@ -22,7 +22,7 @@ export default async function handler(
   }
 }
 
-const getAdminRequest = withMiddleware("isAdmin")(
+const getAdminRequest = withMiddleware("withAuth")(
   async (req: NextApiUserRequest, res: NextApiResponse) => {
     try {
       const adminRequest = await prisma.adminRequest.findUnique({
@@ -49,7 +49,16 @@ const getAdminRequest = withMiddleware("isAdmin")(
           },
         },
       });
-      res.status(200).json(adminRequest);
+      if (
+        adminRequest &&
+        (req.user.id === adminRequest.user.id ||
+          (adminRequest.requestApprover &&
+            req.user.id === adminRequest.requestApprover.id))
+      ) {
+        res.status(200).json(adminRequest);
+      }
+
+      res.status(400).json(adminRequest);
     } catch (error) {
       res.status(500).json(error);
     }

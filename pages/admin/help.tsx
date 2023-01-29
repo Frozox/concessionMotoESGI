@@ -1,4 +1,5 @@
 import { adminRequest } from "@prisma/client"
+import { useRouter } from "next/router"
 import React from "react"
 import { useAuth } from "../../helpers/context/User"
 import { getInitial } from "../../helpers/helper"
@@ -6,6 +7,7 @@ import { getAdminRequests, updateAdminRequestById } from "../../helpers/requests
 import { LayoutAdmin } from "./layout"
 
 const AdminHelp = () => {
+    const router = useRouter();
     const { socket, token, user } = useAuth();
 
     type adminRequestWithUser = adminRequest & {
@@ -27,6 +29,7 @@ const AdminHelp = () => {
         { slug: "accepted", status: 'Accepté', color: 'bg-green-200 text-green-800' },
         { slug: "declined", status: 'Refusé', color: 'bg-red-200 text-red-800' },
         { slug: "cancelled", status: 'Annulé', color: 'bg-gray-200 text-gray-800' },
+        { slug: "closed", status: 'Cloturé', color: 'bg-blue-200 text-blue-800' }
     ]
 
     React.useEffect(() => {
@@ -55,10 +58,17 @@ const AdminHelp = () => {
     }, [socket, adminRequests])
 
     const handleSelect = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, requestId: string, action: string, status: string) => {
-        if (status !== 'pending') return;
         if (!token || !user) return;
+        if (action === 'close' && status === 'accepted') {
+            return updateAdminRequestById(token, requestId, { status: 'closed' })
+        }
+        if (status !== 'pending') return;
         if (action === 'accept') {
             updateAdminRequestById(token, requestId, { status: 'accepted', requestApproverId: user.id })
+            console.log('Vous allez être redirigé vers la page de la demande dans 5 secondes');
+            setTimeout(() => {
+                router.push(`/messages/admin-request/${requestId}`);
+            }, 5000)
         } else if (action === 'decline') {
             updateAdminRequestById(token, requestId, { status: 'declined', requestApproverId: user.id })
         }
@@ -101,6 +111,9 @@ const AdminHelp = () => {
                                         </div>
                                     ) || <div />}
                                     <div className="flex space-x-2">
+                                        {request.status === 'accepted' && (
+                                            <div className="text-white rounded-md px-2 py-1 bg-blue-500 hover:cursor-pointer" onClick={(e) => handleSelect(e, request.id, "close", request.status)}>Cloturer la demande</div>
+                                        )}
                                         <div className={`text-white rounded-md px-2 py-1 ${request.status === 'pending' ? 'bg-green-500 hover:cursor-pointer' : 'bg-gray-500'}`} onClick={(e) => handleSelect(e, request.id, "accept", request.status)}>Accepter</div>
                                         <div className={`text-white rounded-md px-2 py-1 ${request.status === 'pending' ? 'bg-red-500 hover:cursor-pointer' : 'bg-gray-500'}`} onClick={(e) => handleSelect(e, request.id, "decline", request.status)}>Refuser</div>
                                     </div>
