@@ -11,23 +11,24 @@ datasource db {
 }
 
 model User {
-  id                       String           @id @default(uuid())
-  email                    String           @unique
+  id                       String                @id @default(uuid())
+  email                    String                @unique
   firstName                String
   lastName                 String
   password                 String
-  online                   Boolean          @default(false)
-  createdAt                DateTime         @default(now())
-  updatedAt                DateTime         @default(now()) @updatedAt
+  online                   Boolean               @default(false)
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @default(now()) @updatedAt
   roles                    Role[]
   bikes                    Bike[]
-  ownerOnChannels          Channel[]        @relation("OwnerOnChannels")
+  ownerOnChannels          Channel[]             @relation("OwnerOnChannels")
   memberOnChannels         Channel[]
-  authorOnDirectMessages   DirectMessage[]  @relation("AuthorOnDirectMessages")
-  receiverOnDirectMessages DirectMessage[]  @relation("ReceiverOnDirectMessages")
+  authorOnDirectMessages   DirectMessage[]       @relation("AuthorOnDirectMessages")
+  receiverOnDirectMessages DirectMessage[]       @relation("ReceiverOnDirectMessages")
   channelMessages          ChannelMessage[]
   adminRequests            adminRequest[]
-  approvedRequests         adminRequest[]   @relation("RequestApprover")
+  approvedRequests         adminRequest[]        @relation("RequestApprover")
+  adminRequestMessage      adminRequestMessage[]
 }
 
 model Role {
@@ -123,12 +124,24 @@ model BotUserMessage {
 }
 
 model adminRequest {
-  id                String   @id @default(uuid())
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId            String
-  requestApprover   User?    @relation(name: "RequestApprover", fields: [requestApproverId], references: [id])
-  requestApproverId String?
-  status            String   @default("pending")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @default(now()) @updatedAt
+  id                  String                @id @default(uuid())
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId              String
+  requestApprover     User?                 @relation(name: "RequestApprover", fields: [requestApproverId], references: [id])
+  requestApproverId   String?
+  status              String                @default("pending")
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
+  adminRequestMessage adminRequestMessage[]
+}
+
+model adminRequestMessage {
+  id        String       @id @default(uuid())
+  request   adminRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  requestId String
+  author    User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  content   String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @default(now()) @updatedAt
 }

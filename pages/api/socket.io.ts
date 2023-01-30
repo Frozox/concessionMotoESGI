@@ -31,6 +31,11 @@ const socketHandler = async (
         for (const channel of socket.data.user.memberOnChannels) {
           socket.join("channel_" + channel.id);
         }
+        for (const adminRequest of socket.data.user.adminRequests) {
+          if (adminRequest.status === "accepted") {
+            socket.join("admin_request_" + adminRequest.id);
+          }
+        }
         socket.join("directMessage_" + socket.data.user.id);
         socket.join("notifications_" + socket.data.user.id);
         if (
@@ -38,6 +43,11 @@ const socketHandler = async (
             (role: { name: string }) => role.name === "ADMIN"
           )
         ) {
+          for (const adminRequest of socket.data.user.approvedRequests) {
+            if (adminRequest.status === "accepted") {
+              socket.join("admin_request_" + adminRequest.id);
+            }
+          }
           socket.join("admin_notifications_in_tab");
           socket.join("admin_notifications");
         }
@@ -58,6 +68,8 @@ const socketHandler = async (
                 bikes: true,
                 ownerOnChannels: true,
                 memberOnChannels: true,
+                adminRequests: true,
+                approvedRequests: true,
               },
             });
 

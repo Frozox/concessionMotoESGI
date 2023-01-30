@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import withMiddleware from "../../../../lib/middlewares";
-import { PrismaClientSingleton } from "../../../../lib/prismaUtils";
+import withMiddleware from "../../../../../lib/middlewares";
+import { PrismaClientSingleton } from "../../../../../lib/prismaUtils";
 import {
   NextApiResponseServerIO,
   NextApiUserRequest,
-} from "../../../../lib/types";
+} from "../../../../../lib/types";
 
 const prisma = PrismaClientSingleton.getInstance().prisma;
 
@@ -108,6 +108,31 @@ const updateAdminRequest = withMiddleware("isAdmin")(
         },
       });
 
+      if (adminRequest.status === "accepted") {
+        // admin / user join adminRequest chat
+        res.socket.server.io.sockets.sockets.forEach((socket) => {
+          if (
+            socket.data.user &&
+            adminRequest.requestApprover &&
+            (socket.data.user.id === adminRequest.user.id ||
+              socket.data.user.id === adminRequest.requestApprover.id)
+          ) {
+            return socket.join("admin_request_" + adminRequest.id);
+          }
+        });
+      } else if (adminRequest.status === "closed") {
+        // admin / user leave adminRequest chat
+        res.socket.server.io.sockets.sockets.forEach((socket) => {
+          if (
+            socket.data.user &&
+            adminRequest.requestApprover &&
+            (socket.data.user.id === adminRequest.user.id ||
+              socket.data.user.id === adminRequest.requestApprover.id)
+          ) {
+            return socket.leave("admin_request_" + adminRequest.id);
+          }
+        });
+      }
       res.socket.server.io
         .to("notifications_" + adminRequest.user.id)
         .emit("admin_request_status", "PATCH", adminRequest);
