@@ -13,7 +13,7 @@ export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     const headers = [
         { title: 'Channels', link: '/admin/channels' },
         { title: 'Demande assistance', link: '/admin/help' },
-        { title: 'Chatbot', link: '/admin/chatbot' },
+        { title: 'Chatbot', link: '/admin/notifs' },
     ]
     const router = useRouter()
     const { toggle, isShowing } = useModal()

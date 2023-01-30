@@ -111,8 +111,11 @@ const sendAdminRequest = withMiddleware("withAuth")(
         .to("notifications_" + req.user.id)
         .emit("admin_request_status", "POST", adminRequest);
       res.socket.server.io
+        .to("notifications_" + req.user.id)
+        .emit("notifications", "POST", { type: "alert-success", message: `Votre demande à bien été envoyé` });
+      res.socket.server.io
         .to("admin_notifications")
-        .emit("admin_notifications", "POST", adminRequest);
+        .emit("admin_notifications", "POST", { type: "alert-info", message: `Une demande d'assitance de la part de ${adminRequest.user.firstName} à été reçu` });
       res.socket.server.io
         .to("admin_notifications_in_tab")
         .emit("admin_notifications_in_tab", "POST", adminRequest);

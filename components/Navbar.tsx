@@ -11,11 +11,12 @@ import { useAlert } from "../helpers/hooks/Alert/useAlert"
 import { Avatar } from "./Avatar"
 import { getInitial } from "../helpers/helper"
 import { useAuth } from "../helpers/context/User"
+import { IAlertProps, useAlertProps } from "../helpers/hooks/Alert/alert"
 
 export const Navbar = ({ children }: { children: JSX.Element }) => {
     const { isShowing, toggle } = useModal()
     const { isShowing: isShowingRegister, toggle: toggleRegister } = useModal()
-    const { showAlert, toggleAlert } = useAlert()
+    const { showAlert, toggleAlert, setShowAlert } = useAlert()
     const [show, setShow] = React.useState(false)
     const { token, isAdmin, user } = useAuth()
     const [isShowingMobile, setIsShowingMobile] = React.useState(false)
@@ -27,22 +28,40 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
         { href: "/admin", label: "Administration", visible: isAdmin },
     ]
 
+    const [alertMessage, setAlertMessage] = React.useState<IAlertProps>({
+        type: 'alert-info',
+        message: 'Ceci est un pop alert !'
+    })
+
+    const handleAlert = ({ type, message }: IAlertProps) => {
+        setAlertMessage({
+            type: type,
+            message: message
+        })
+        toggleAlert()
+        setTimeout(() => {
+            setShowAlert(false)
+            setAlertMessage({ type: 'alert-info', message: '' })
+        }, 5000)
+    }
+
     React.useEffect(() => {
         if (!socket) return;
         // User notifications
         socket.removeListener('notifications');
-        socket.on('notifications', (method: string, notif: any) => {
-            console.log('notifications', "IN NAVBAR");
+        socket.on('notifications', (method: string, notif: IAlertProps) => {
+            console.log('notif', notif);
+            handleAlert({ type: notif.type, message: notif.message })
         });
         // Admin notifications
         socket.removeListener('admin_notifications');
-        socket.on('admin_notifications', (method: string, notif: any) => {
-            console.log('admin_notifications', "IN NAVBAR");
+        socket.on('admin_notifications', (method: string, notif: IAlertProps) => {
+            handleAlert({ type: notif.type, message: notif.message })
         });
         // Admin contact request
         socket.removeListener('admin_contact_request');
         socket.on('admin_contact_request', (method: string, status: any) => {
-            console.log('admin_contact_request', "IN NAVBAR")
+            handleAlert({ type: 'alert-info', message: status.message })
         });
     }, [socket])
 
@@ -60,7 +79,7 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
                 <div className='w-full relative flex justify-end z-50 top-24 right-5'>
                     <div className='w-fit absolute'>
                         <AlertPopHover
-                            alert={{ type: 'alert-info', message: 'Ceci est un pop alert !' }}
+                            alert={{ type: alertMessage.type, message: alertMessage.message }}
                             showAlert={showAlert}
                             toggleAlert={toggleAlert}
                         />
