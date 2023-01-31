@@ -1,6 +1,7 @@
 
 export interface IAlertProps {
     type: 'alert-info' | 'alert-success' | 'alert-warning' | 'alert-error' | 'alert'
+    message: string
 }
 
 export interface useAlertProps {
