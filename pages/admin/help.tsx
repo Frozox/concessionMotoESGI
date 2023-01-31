@@ -5,7 +5,7 @@ import { useAuth } from "../../helpers/context/User"
 import { getInitial } from "../../helpers/helper"
 import { getAdminRequests, toogleMyAvailability, updateAdminRequestById } from "../../helpers/requests/adminRequest"
 import { getUserById } from "../../helpers/requests/user"
-import { LayoutAdmin } from "./layout"
+import LayoutAdmin from "./layout"
 
 const AdminHelp = () => {
     const router = useRouter();
@@ -71,7 +71,6 @@ const AdminHelp = () => {
         if (status !== 'pending') return;
         if (action === 'accept') {
             updateAdminRequestById(token, requestId, { status: 'accepted', requestApproverId: user.id })
-            console.log('Vous allez être redirigé vers la page de la demande dans 5 secondes');
             setTimeout(() => {
                 router.push(`/messages/admin-request/${requestId}`);
             }, 5000)

@@ -5,7 +5,7 @@ import { useAuth } from "../../helpers/context/User";
 import { IAlertProps } from "../../helpers/hooks/Alert/alert";
 import { useAlert } from "../../helpers/hooks/Alert/useAlert";
 import { sendCommercialNotification } from "../../helpers/requests/notifs";
-import { LayoutAdmin } from "./layout"
+import LayoutAdmin from "./layout"
 
 const AdminChatbot = () => {
     const [selected, setSelected] = React.useState('alert-info')
@@ -36,7 +36,6 @@ const AdminChatbot = () => {
             handleAlert('alert-success', 'Notification envoyée avec succès')
             setMessage('')
         }).catch((e) => {
-            console.log(e.message)
             handleAlert('alert-error', 'La notification n\'a pas pu être envoyée');
         })
     }

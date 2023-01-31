@@ -19,7 +19,7 @@ const socketHandler = async (
     const io = new ServerIO(httpServer, {
       path: "/api/socket.io",
       cors: {
-        origin: "http://localhost:8080",
+        origin: process.env.ALLOWED_ORIGINS ?? "http://localhost:8080",
       },
     });
 
