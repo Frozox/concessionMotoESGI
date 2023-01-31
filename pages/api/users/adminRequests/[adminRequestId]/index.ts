@@ -55,7 +55,7 @@ const getAdminRequest = withMiddleware("withAuth")(
           (adminRequest.requestApprover &&
             req.user.id === adminRequest.requestApprover.id))
       ) {
-        res.status(200).json(adminRequest);
+        return res.status(200).json(adminRequest);
       }
 
       res.status(400).json(adminRequest);

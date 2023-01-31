@@ -52,3 +52,19 @@ export const getMyAdminRequests = (token: string) => {
     method: "GET",
   });
 };
+
+export const toogleMyAvailability = (token: string) => {
+  return apiRequest({
+    url: `/users/adminAvailable`,
+    token,
+    method: "PATCH",
+  });
+};
+
+export const getAdminAvailable = (token: string) => {
+  return apiRequest({
+    url: `/users/adminAvailable`,
+    token,
+    method: "POST",
+  });
+};
