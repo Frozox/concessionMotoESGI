@@ -52,7 +52,6 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
         // User notifications
         socket.removeListener('notifications');
         socket.on('notifications', (method: string, notif: IAlertProps) => {
-            console.log('notif', notif);
             handleAlert({ type: notif.type, message: notif.message })
         });
         // Admin notifications

@@ -8,7 +8,7 @@ import { useAuth } from "../../helpers/context/User"
 import useModal from "../../helpers/hooks/Modal/useModal"
 import { createChannel } from "../../helpers/requests/forum"
 
-export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
+const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
     const [selectedIndex, setSelectedIndex] = React.useState(0)
     const headers = [
         { title: 'Channels', link: '/admin/channels' },
@@ -42,7 +42,7 @@ export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
                         {headers[0].link === router.pathname ? (
                             <div className="w-52 relative flex items-center space-x-3 justify-between">
                                 <div className="-ml-0.5 w-0.5 h-10 bg-white" />
-                                <div className="w-fit bg-white/50 text-center p-2 items-center rounded-md cursor-pointer hover:bg-white/90 hover:text-green-500" onClick={toggle}>Ajouté {headers[0].title}</div>
+                                <div className="w-fit bg-white/50 text-center p-2 items-center rounded-md cursor-pointer hover:bg-white/90 hover:text-green-500" onClick={toggle}>Ajouter {headers[0].title}</div>
                             </div>
                         ) : null}
                     </Tab.List>
@@ -54,7 +54,7 @@ export const LayoutAdmin = ({ children }: { children: JSX.Element }) => {
             <Modal
                 isShowing={isShowing}
                 toggle={toggle}
-                title={'Ajouté un channel'}
+                title={'Ajouter un channel'}
                 content={<FormAddChannel modalToggle={toggle} />}
             />
         </Fragment>
@@ -101,7 +101,7 @@ const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
                 <input type='number' {...register('capacity', { required: true })} placeholder='Capacité Max' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none text-black' />
                 {errors.lastname && <span>This field is required</span>}
             </div>
-            <div className='flex flex-col'>
+            <div className='hidden'>
                 <input type='text' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none text-black' defaultValue={user?.firstName + ' ' + user?.lastName} />
             </div>
             {formError && <p className='text-red-500'>{formError}</p>}
@@ -111,3 +111,5 @@ const FormAddChannel = ({ modalToggle }: { modalToggle: Function }) => {
         </form>
     )
 }
+
+export default LayoutAdmin

@@ -6,7 +6,7 @@ import { BiEdit } from 'react-icons/bi'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { useForm } from 'react-hook-form'
 import React from "react"
-import { updateChannel } from "../helpers/requests/forum"
+import { deleteChannel, updateChannel } from "../helpers/requests/forum"
 import { useAuth } from "../helpers/context/User"
 import { User } from "@prisma/client"
 export interface IItemTableProps {
@@ -19,15 +19,29 @@ export interface IItemTableProps {
     status: boolean
 }
 
+interface IItemTablePropsUpdate extends IItemTableProps {
+    toggle: () => void
+}
+
 export const SelectableItemTable = (
     { title, members, capacity, id, owner, status, createdAt }: IItemTableProps
 ) => {
     const { toggle, isShowing } = useModal()
     const { toggle: toggleDelete, isShowing: isShowingDelete } = useModal()
+    const { user, token } = useAuth()
+
     const handleStatus = () => {
-        console.log('status', !status);
+        if (!token) return;
+        updateChannel({ open: !status }, token, id);
     }
-    const { user } = useAuth()
+
+    const handleRemove = () => {
+        if (!token) return;
+        deleteChannel(id, token)
+            .then(res => res.json())
+            .then(() => toggleDelete())
+    }
+
     return (
         <Fragment>
             <div
@@ -68,19 +82,6 @@ export const SelectableItemTable = (
                 isShowing={isShowing}
                 toggle={toggle}
                 title={'Modification du cannal'}
-                yesNo
-                yesNoAction={
-                    [{
-                        text: "Enregistrer",
-                        action: () => console.log("Update"), //! Need to trigger update from here
-                        type: 'yes'
-                    },
-                    {
-                        text: "Annuler",
-                        action: toggle,
-                        type: 'no'
-                    }]
-                }
                 content={
                     <HandleFormUpdate
                         title={title}
@@ -90,6 +91,7 @@ export const SelectableItemTable = (
                         owner={user?.firstName + ' ' + user?.lastName}
                         status={status}
                         createdAt={createdAt}
+                        toggle={toggle}
                     />
                 }
             />
@@ -102,7 +104,7 @@ export const SelectableItemTable = (
                 yesNoAction={
                     [{
                         text: "Supprimer",
-                        action: () => console.log("Supprimer"),
+                        action: handleRemove,
                         type: 'yes'
                     },
                     {
@@ -116,18 +118,22 @@ export const SelectableItemTable = (
     )
 }
 
-export const HandleFormUpdate = ({ title, capacity, owner, id }: IItemTableProps) => {
+export const HandleFormUpdate = ({ title, capacity, owner, id, toggle }: IItemTablePropsUpdate) => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { token, user } = useAuth()
 
     const onSubmit = (data: any) => {
         if (token) {
-            updateChannel(data, token, id).then(res => res.json().then(res => console.log(res)))
+            if (data.capacity) {
+                data.capacity = parseInt(data.capacity)
+            }
+            updateChannel(data, token, id)
         }
     }
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        toggle();
         handleSubmit(onSubmit)();
     }
     return (
@@ -140,9 +146,13 @@ export const HandleFormUpdate = ({ title, capacity, owner, id }: IItemTableProps
                 <input type='number' {...register('capacity', { required: true })} placeholder='Capacité' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none' defaultValue={capacity} />
                 {errors.lastname && <span>This field is required</span>}
             </div>
-            <div className='flex flex-col'>
+            <div className='hidden'>
                 <input type='text' placeholder='Propriétaire' className='w-full h-10 my-2 border border-gray-300 rounded-md p-2 focus:outline-none' defaultValue={owner} />
                 {errors.email && <span>This field is required</span>}
+            </div>
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600  text-base font-medium text-white hover:bg-green-700  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">Enregister</button>
+                <button type="button" onClick={() => toggle()} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-white  text-base font-medium text-gray-700 hover:bg-gray-50  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">Annuler</button>
             </div>
         </form>
     )
