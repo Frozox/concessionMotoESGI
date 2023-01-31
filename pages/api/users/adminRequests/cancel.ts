@@ -59,6 +59,9 @@ const cancelAdminRequest = withMiddleware("withAuth")(
 
       res.socket.server.io
         .to("notifications_" + req.user.id)
+        .emit("notifications", "POST", { type: "alert-info", message: `Votre demande à bien été annulée` });
+      res.socket.server.io
+        .to("notifications_" + req.user.id)
         .emit("admin_request_status", "PATCH", canceledAdminRequest);
       res.socket.server.io
         .to("admin_notifications_in_tab")

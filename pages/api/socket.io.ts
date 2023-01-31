@@ -68,6 +68,8 @@ const socketHandler = async (
           }
           socket.join("admin_notifications_in_tab");
           socket.join("admin_notifications");
+        } else {
+          socket.join("commercial_notifications");
         }
       }
     });
