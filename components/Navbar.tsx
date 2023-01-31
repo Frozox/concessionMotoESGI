@@ -60,10 +60,10 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
         socket.on('admin_notifications', (method: string, notif: IAlertProps) => {
             handleAlert({ type: notif.type, message: notif.message })
         });
-        // Admin contact request
-        socket.removeListener('admin_contact_request');
-        socket.on('admin_contact_request', (method: string, status: any) => {
-            handleAlert({ type: 'alert-info', message: status.message })
+        // Commercial notifications
+        socket.removeListener('commercial_notifications');
+        socket.on('commercial_notifications', (method: string, notif: IAlertProps) => {
+            handleAlert(notif)
         });
     }, [socket])
 

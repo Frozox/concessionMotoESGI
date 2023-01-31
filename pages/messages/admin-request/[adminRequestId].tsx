@@ -33,12 +33,12 @@ const AdminRequest: NextPage = () => {
 
     const handleCloseChat = () => {
         if (token && user && isAdmin) {
-            setTimeout(() => {
-                updateAdminRequestById(token, adminRequestId, { status: 'closed' })
-                    .then(() => {
+            updateAdminRequestById(token, adminRequestId, { status: 'closed' })
+                .then(() => {
+                    setTimeout(() => {
                         router.push('/admin/help');
-                    })
-            }, 5000);
+                    }, 5000);
+                })
         }
     }
 
@@ -69,7 +69,9 @@ const AdminRequest: NextPage = () => {
         socket.removeListener('admin_request_status');
         socket.on('admin_request_status', (method: string, request: adminRequest) => {
             if (method === "PATCH" && request.status === 'closed') {
-                return router.push('/messages');
+                setTimeout(() => {
+                    return router.push('/messages');
+                }, 5000);
             }
         });
         socket.removeListener('admin_request_messages');

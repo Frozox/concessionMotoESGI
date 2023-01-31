@@ -1,12 +1,10 @@
 import { apiRequest } from ".."
 
-export const postNotifs = (message: string, type: string) => {
+export const sendCommercialNotification = (token:string, payload: any) => {
     return apiRequest({
         url: '/notifs',
         method: 'POST',
-        payload: {
-            message,
-            type,
-        }
+        token,  
+        payload
     })
 }

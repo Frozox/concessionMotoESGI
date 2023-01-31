@@ -1,21 +1,36 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import withMiddleware from "../../../lib/middlewares";
 import {
-    NextApiResponseServerIO,
-    NextApiUserRequest,
+  NextApiResponseServerIO,
+  NextApiUserRequest,
 } from "../../../lib/types";
 
 export default async function handler(
-    req: NextApiUserRequest,
-    res: NextApiResponseServerIO
+  req: NextApiRequest,
+  res: NextApiResponse
 ) {
-
-    if (req.method === "POST") {
-        const { message, type } = req.body;
-        res.socket.server.io
-            .to("users")
-            .emit("notification", { message, type });
-        res.status(201).json({ message: "Notification sent" });
-    } else {
-        res.status(405).json({ message: "Method not allowed" });
-    }
-
+  switch (req.method) {
+    case "POST":
+      return await sendCommercialNotification(req, res);
+    default:
+      return res.status(405).json({ message: "Method not allowed" });
+  }
 }
+
+const sendCommercialNotification = withMiddleware("isAdmin")(
+  async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
+    try {
+      const { message, type } = req.body;
+
+      if (!message || !type) return res.status(400).end();
+
+      res.socket.server.io
+        .to("commercial_notifications")
+        .emit("commercial_notifications", "POST", { type, message });
+
+      res.status(204).end();
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+);

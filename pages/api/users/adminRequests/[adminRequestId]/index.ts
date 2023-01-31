@@ -117,9 +117,23 @@ const updateAdminRequest = withMiddleware("isAdmin")(
             (socket.data.user.id === adminRequest.user.id ||
               socket.data.user.id === adminRequest.requestApprover.id)
           ) {
+            res.socket.server.io
+              .to("notifications_" + adminRequest.user.id)
+              .emit("notifications", "POST", {
+                type: "alert-info",
+                message:
+                  "Vous allez être mis en relation avec un conseiller dans quelques instants",
+              });
             return socket.join("admin_request_" + adminRequest.id);
           }
         });
+      } else if (adminRequest.status === "declined") {
+        res.socket.server.io
+          .to("notifications_" + adminRequest.user.id)
+          .emit("notifications", "POST", {
+            type: "alert-error",
+            message: "Votre demande à été refusée, revenez un peu plus tard",
+          });
       } else if (adminRequest.status === "closed") {
         // admin / user leave adminRequest chat
         res.socket.server.io.sockets.sockets.forEach((socket) => {
@@ -129,6 +143,14 @@ const updateAdminRequest = withMiddleware("isAdmin")(
             (socket.data.user.id === adminRequest.user.id ||
               socket.data.user.id === adminRequest.requestApprover.id)
           ) {
+            res.socket.server.io
+              .to("notifications_" + adminRequest.user.id)
+              .emit("notifications", "POST", {
+                type: "alert-info",
+                message:
+                  "La session est terminé, vous allez être redirigé dans quelques instants",
+              });
+
             return socket.leave("admin_request_" + adminRequest.id);
           }
         });
