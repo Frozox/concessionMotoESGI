@@ -33,6 +33,8 @@ export const Navbar = ({ children }: { children: JSX.Element }) => {
         message: 'Ceci est un pop alert !'
     })
 
+    const [showMenu, setShowMenu] = React.useState(false)
+
     const handleAlert = ({ type, message }: IAlertProps) => {
         setAlertMessage({
             type: type,
