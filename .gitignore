@@ -39,3 +39,8 @@ next-env.d.ts
 
 #lock 
 *.lock
+
+#prettier
+.prettierrc
+# Sentry
+.sentryclirc

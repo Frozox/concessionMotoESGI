@@ -17,6 +17,10 @@ stop:
 
 down:
 	docker compose down --volumes
+	docker volume remove postgres_data
 
 migrate:
 	yarn migrate
+
+prisma-studio:
+	yarn prisma studio
