@@ -25,6 +25,23 @@ const socketHandler = async (
 
     io.on("connection", async (socket) => {
       if (socket.data.user) {
+        await prisma.user.update({
+          where: { id: socket.data.user.id },
+          data: { online: true },
+        });
+        socket.on("disconnect", async () => {
+          await prisma.user.update({
+            where: { id: socket.data.user.id },
+            data: { online: false },
+          });
+          if (
+            socket.data.user.roles.some(
+              (role: { name: string }) => role.name === "ADMIN"
+            )
+          ) {
+            io.sockets.emit("admin_available", await adminAvailibility());
+          }
+        });
         for (const channel of socket.data.user.ownerOnChannels) {
           socket.join("channel_" + channel.id);
         }
@@ -43,6 +60,7 @@ const socketHandler = async (
             (role: { name: string }) => role.name === "ADMIN"
           )
         ) {
+          io.sockets.emit("admin_available", await adminAvailibility());
           for (const adminRequest of socket.data.user.approvedRequests) {
             if (adminRequest.status === "accepted") {
               socket.join("admin_request_" + adminRequest.id);
@@ -72,7 +90,6 @@ const socketHandler = async (
                 approvedRequests: true,
               },
             });
-
             socket.data.user = user ? exclude(user, "password") : null;
             return next();
           }
@@ -81,6 +98,26 @@ const socketHandler = async (
         }
       );
     });
+
+    const adminAvailibility = async () => {
+      const admins = await prisma.user.aggregate({
+        where: {
+          roles: {
+            some: {
+              name: "ADMIN",
+            },
+          },
+          AND: {
+            isAvailable: true,
+            online: true,
+          },
+        },
+        _count: {
+          id: true,
+        },
+      });
+      return admins._count.id > 0;
+    };
 
     res.socket.server.io = io;
   }

@@ -21,7 +21,6 @@ const AdminRequest: NextPage = () => {
     const router = useRouter();
     const { adminRequestId } = router.query as { adminRequestId: string };
     const { token, socket, user, isAdmin } = useAuth();
-    const [adminRequest, setAdminRequest] = React.useState(null);
     const [adminRequestMessages, setAdminRequestMessages] = React.useState<adminRequestMessageWithUser[]>([]);
     const [chatInputValue, setChatInputValue] = React.useState<string>('');
 
@@ -45,7 +44,6 @@ const AdminRequest: NextPage = () => {
 
     React.useEffect(() => {
         if (!token || !adminRequestId) return;
-        if (adminRequest) return;
         getAdminRequestById(token, adminRequestId)
             .then((res) => res.json())
             .then(request => {
@@ -62,7 +60,7 @@ const AdminRequest: NextPage = () => {
             .then(messages => {
                 setAdminRequestMessages(messages);
             })
-    }, [adminRequest, adminRequestId, token, router]);
+    }, [adminRequestId, token, router]);
 
     React.useEffect(() => {
         if (!socket) return;
@@ -76,7 +74,6 @@ const AdminRequest: NextPage = () => {
         });
         socket.removeListener('admin_request_messages');
         socket.on('admin_request_messages', (method: string, requestMessage: adminRequestMessageWithUser) => {
-            console.log(method, requestMessage);
             if (method === "POST") {
                 if (requestMessage.requestId !== adminRequestId) return;
                 setAdminRequestMessages([requestMessage, ...adminRequestMessages]);

@@ -16,6 +16,7 @@ model User {
   firstName                String
   lastName                 String
   password                 String
+  isAvailable              Boolean               @default(true)
   online                   Boolean               @default(false)
   createdAt                DateTime              @default(now())
   updatedAt                DateTime              @default(now()) @updatedAt
