@@ -35,6 +35,11 @@ const getChannel = withMiddleware("inChannelOrAdmin")(
               online: true,
             },
           },
+          members: {
+            select: {
+              id: true,
+            },
+          },
           _count: {
             select: {
               members: true,
@@ -57,14 +62,20 @@ const getChannel = withMiddleware("inChannelOrAdmin")(
 const updateChannel = withMiddleware("inChannelOrAdmin")(
   async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
     const { title, capacity, open } = req.body;
-
+    console.log(open);
     try {
       const channel = await prisma.channel.update({
         where: { id: String(req.query.channelId) },
         data: {
-          title,
-          capacity: capacity > 0 ? capacity : undefined,
-          open,
+          ...(title && {
+            title,
+          }),
+          ...(capacity && capacity > 0 && {
+            capacity,
+          }),
+          ...(open !== undefined && {
+            open,
+          }),
         },
         include: {
           owner: {
@@ -73,6 +84,11 @@ const updateChannel = withMiddleware("inChannelOrAdmin")(
               firstName: true,
               lastName: true,
               online: true,
+            },
+          },
+          members: {
+            select: {
+              id: true,
             },
           },
           _count: {

@@ -3,7 +3,7 @@ import { IChannel } from "../../components/Channel"
 import { SelectableItemTable } from "../../components/SelectableItemTable"
 import { useAuth } from "../../helpers/context/User"
 import { getChannels } from "../../helpers/requests/forum"
-import { LayoutAdmin } from "./layout"
+import LayoutAdmin from "./layout"
 
 const AdminChannels = () => {
     const [channels, setChannels] = React.useState<IChannel[]>([])
