@@ -62,7 +62,10 @@ const getChannel = withMiddleware("inChannelOrAdmin")(
 const updateChannel = withMiddleware("inChannelOrAdmin")(
   async (req: NextApiUserRequest, res: NextApiResponseServerIO) => {
     const { title, capacity, open } = req.body;
+<<<<<<< HEAD
     console.log(open);
+=======
+>>>>>>> prod-build
     try {
       const channel = await prisma.channel.update({
         where: { id: String(req.query.channelId) },
